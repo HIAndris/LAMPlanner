@@ -1,5 +1,3 @@
 # LAMPlanner
 
-Ez a repo dokumentációja.
-Még egy sor.
-
+Ez lesz a repo dokumentációja.
