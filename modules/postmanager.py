@@ -43,7 +43,7 @@ def Create(parancs_parameterek): # Megívja a fájlkezelés | létrehozás funkc
     pass
 
 def List(parancs_parameterek): # Bejegyzés | címek listázása |
-    # bejegyzes_cimek = filemanager.UserStored(username: str)
+    # bejegyzes_cimek = filemanager.UserStored(username: str) megfelelő paraméterekkel
     bejegyzes_cimek = ["bejegyzes1", "bejegyzes2", "bejegyzes3", "bejegyzes4", "bejegyzes5"]
     os.system('cls')
 
