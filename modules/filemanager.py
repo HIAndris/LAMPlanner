@@ -1,10 +1,12 @@
-def SignUp(name, password):
+def SignUp(name, password) -> bool:
     pass
 
-def LogIn(name, password):
+
+def LogIn(name, password) -> bool:
     pass
 
-def CreatePasswordHash(password: str):
+
+def CreatePasswordHash(password: str) -> bytes:
     import hashlib
     import base64
 
@@ -13,9 +15,9 @@ def CreatePasswordHash(password: str):
     
     return base64Hash
 
-def CreateEncryptionKey(name: str, password: str):
+
+def CreateEncryptionKey(name: str, password: str) -> bytes:
     import hashlib
-    import base64
     
     hash = hashlib.sha256(password.encode()).digest()
     iv = hashlib.sha256(name.encode()).digest()
@@ -26,25 +28,70 @@ def CreateEncryptionKey(name: str, password: str):
     
     return bytes(key)
 
-def rotate_left(byte, shift):
+
+def RotateLeft(byte: int, shift: int) -> int:
     return ((byte << shift) & 0xFF) | (byte >> (8 - shift))
 
-def rotate_right(byte, shift):
+
+def RotateRight(byte: int, shift: int) -> int:
     return ((byte >> shift) | (byte << (8 - shift))) & 0xFF
 
-def Store(name: str, key: bytes, title: str, text: str):
+
+def Encrypt(data: str, key: bytes) -> bytes:
+    dataBytes = bytes(data, "utf-8")
+    encrypted = bytearray()
+    keyLen = len(key)
+    for i, byte in enumerate(dataBytes):
+        shift = key[i % keyLen] % 8
+        encrypted.append(RotateLeft(byte, shift))
+    
+    encryptedLen = len(encrypted)
+    k = 0
+    for _ in range(32):
+        i = 0
+        for i in range(encryptedLen):
+            j = key[k % keyLen] % encryptedLen
+            encrypted[i], encrypted[j] = encrypted[j], encrypted[i]
+            k += 1
+    
+    return bytes(encrypted)
+
+
+def Decrypt(data: bytes, key: bytes) -> str:
+    keyLen = len(key)
+    decryptedLen = len(data)
+    
+    unshuffled = bytearray(data)
+    k = (32 * decryptedLen) - 1
+    for _ in range(32):
+        for i in range(decryptedLen - 1, -1, -1):
+            j = key[k % keyLen] % decryptedLen
+            unshuffled[i], unshuffled[j] = unshuffled[j], unshuffled[i]
+            k -= 1
+    
+    decrypted = bytearray()
+    for i, byte in enumerate(unshuffled):
+        shift = key[i % keyLen] % 8
+        decrypted.append(RotateRight(byte, shift))
+
+    return decrypted.decode("utf-8")
+
+
+def Store(name: str, key: bytes, title: str, text: str) -> bool:
     pass
 
-def Read(name: str, key: bytes, title: str, text: str):
+
+def Read(name: str, key: bytes, title: str, text: str) -> str:
     pass
 
-def Users():
+
+def Users() -> list:
     pass
 
-def UserStored(name: str, key: bytes):
+
+def UserStored(name: str, key: bytes) -> list:
     pass
 
-def Delete(name: str, key: bytes, title: str):
-    pass
 
-print(CreateEncryptionKey("józsi2", "jelszóóó00123400"))
+def Delete(name: str, key: bytes, title: str) -> bool:
+    pass
