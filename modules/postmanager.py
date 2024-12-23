@@ -3,7 +3,8 @@ import os
 import datetime
 from datetime import date
 from datetime import datetime
-from unittest.mock import patch
+import keyboard
+
 
 parancsok = {
     "help":"megjeleníti ezt a felületet.",
@@ -12,7 +13,8 @@ parancsok = {
     "create":"létrehoz egy új bejegyzést. használat: create [bejegyzéscím]; [bejegyzéstartalom]",
     "list":"listázza az összes bejegyzést használata: list [szűrés] szűrési lehetőségek: kész(a készen lévő bejegyzések) folyamatban(a folyamatban lévő bejegyzések) heti(a héten esedékes/határidős bejegyzések) a szűrési érték list után írásával csak a szűrésnek megfelelő bejegyzések jelennek majd meg",
     "open":"megnyit egy bejegyzést cím alapján használata: open [bejegyzéscím]",
-    "done":"készre állítja egy bejegyzés állapotát használat: done [bejegyzéscím]"
+    "done":"készre állítja egy bejegyzés állapotát használat: done [bejegyzéscím]",
+    "Egyéb megjegyzések":"Kérjük a dátumokat ÉÉÉÉ.HH.NN formátumban adja meg. példa: 2025.01.01",
 }
 
 def ListElvalasztoGeneralas():
@@ -48,10 +50,107 @@ def Delete(parancs_parameterek): # Meghívja a fájlkezelés | törlési funkci�
     pass
 
 def Edit(parancs_parameterek): # Meghívja a fájlkezelés | szerkesztési funkcióját |
-    pass
+    szerkesztendo = parancs_parameterek[1]
+
+    # adatok = filemanager.Read(username, passwordHash, szerkesztendo) a megfelelő paraméterekkel
+
+    # Itt is bekérjük a címeket filemanager.UserStored(mefelelő paraméterek)
+
+
+    bejegyzes_cim_datum_allapot = [["bejegyzes1", "2024.10.12", "kész"], ["bejegyzes2", "2024.10.13", "kész"], ["bejegyzes3", "2024.11.15", "folyamatban"], ["bejegyzes4", "2024.12.10", "folyamatban"], ["bejegyzes5", "2024.12.20", "folyamatban"], ["bejegyzes6", "2024.12.22", "folyamatban"]]
+    cimek = []
+
+    for csomag in bejegyzes_cim_datum_allapot:
+        cimek.append(csomag[0])
+
+
+    adatok = ["cim", "2024.01.01", "bejegyzestartalom", "folyamatban"]
+
+    if szerkesztendo in cimek:
+
+        allapot = adatok.pop()
+
+        adatsor = ""
+
+        for adat in adatok:
+            adatsor += adat
+            if adatok.index(adat) != 2:
+                adatsor += "; "
+
+        print(f"\nEredeti Bejegyzés és adatai:                 {adatsor}\n")
+
+        parancs_parameterek = input("Kérem adja meg az új bejegyzési adatokat --> ")
+
+        try:
+            bejegyzesadatok = parancs_parameterek.split("; ")
+            cim = bejegyzesadatok.pop(0).replace(" ", "")
+            datum = bejegyzesadatok.pop(0).replace(" ", "")
+            bejegyzestartalom = " ".join(bejegyzesadatok)
+
+            print(cim, datum)
+            print(bejegyzestartalom)
+
+            datum_felbontva = datum.split(".")
+
+            if len(datum_felbontva) == 3 and len(datum_felbontva[1]) == 2 and 0 < int(datum_felbontva[1]) <= 31 and 0 < int(datum_felbontva[2]) < 31 and len(datum_felbontva[2]) == 2:
+                print("\nA bejegyzését rögzítettük.")
+
+                # Ezután továbbítjuk a címet dátumot és a tartalmat rögzítésre
+                #filemanager.Edit(username, passwordHash, cim, datum, bejegyzestartalom, allapot)
+            else:
+                print("\nHelytelenül adta meg a dátumot vagy helytelenül választotta el a bejegyzés elemeit! Nem mentettük a változásokat")
+
+        except IndexError:
+            print("\nHelytelen volt a bejegyzés elemeinek elválasztása. Nem mentettük a változásokat")
+
+        except ValueError:
+            print("Helytelenül volt megadva a parancs. Nem mentettük a változásokat")
+    
+    elif adatok[0] not in cimek:
+        print("Nem létezik ilyen bejegyzés")
 
 def Create(parancs_parameterek): # Megívja a fájlkezelés | létrehozás funkcióját |
-    pass
+    # Itt is bekérjük a címeket filemanager.UserStored(mefelelő paraméterek)
+
+    bejegyzes_cim_datum_allapot = [["bejegyzes1", "2024.10.12", "kész"], ["bejegyzes2", "2024.10.13", "kész"], ["bejegyzes3", "2024.11.15", "folyamatban"], ["bejegyzes4", "2024.12.10", "folyamatban"], ["bejegyzes5", "2024.12.20", "folyamatban"], ["bejegyzes6", "2024.12.22", "folyamatban"]]
+    cimek = []
+
+    for csomag in bejegyzes_cim_datum_allapot:
+        cimek.append(csomag[0])
+
+    try:
+        parancs_parameterek[0] = ""
+
+        bejegyzesadatok = " ".join(parancs_parameterek).split("; ")
+
+        cim = bejegyzesadatok.pop(0).replace(" ", "")
+        datum = bejegyzesadatok.pop(0).replace(" ", "")
+
+        if cim not in cimek:
+
+            bejegyzestartalom = " ".join(bejegyzesadatok)
+
+            print(cim, datum)
+            print(bejegyzestartalom)
+
+            datum_felbontva = datum.split(".")
+
+            if len(datum_felbontva) == 3 and len(datum_felbontva[1]) == 2 and 0 < int(datum_felbontva[1]) <= 31 and 0 < int(datum_felbontva[2]) < 31 and len(datum_felbontva[2]) == 2:
+                print("\nA bejegyzését rögzítettük.")
+
+                # Ezután továbbítjuk a címet dátumot és a tartalmat rögzítésre
+                #filemanager.Store(username, passwordHash, cim, datum, bejegyzestartalom)
+            else:
+                print("\nHelytelenül adta meg a dátumot vagy helytelenül választotta el a bejegyzés elemeit!. Nem mentettük a változásokat")
+
+        elif cim in cimek:
+            print("Már létezik ilyen nevű bejegyzés. Nem mentettük a változásokat")
+
+    except IndexError:
+        print("\nHelytelen volt a bejegyzés elemeinek elválasztása. Nem mentettük a változásokat")
+    
+    except ValueError:
+        print("Helytelenül volt megadva a parancs. Nem mentettük a változásokat")
 
 def SzuresFolyamatban(bejegyzes_cim_datum_allapot):
     print(f"Folyamatban lévő bejegyzések\n")
@@ -84,8 +183,25 @@ def SzuresHeti(bejegyzes_cim_datum_allapot):
             print(f"{csomag[0]} határidő: {csomag[1]} [{csomag[2]}]")
             print(f"{ListElvalasztoGeneralas()}")
 
-def KesszeAlakitas():
-    pass
+def Done(parancs_parameterek):
+    # Itt is bekérjük a címeket filemanager.UserStored(mefelelő paraméterek)
+
+    cim = parancs_parameterek[1]
+
+    bejegyzes_cim_datum_allapot = [["bejegyzes1", "2024.10.12", "kész"], ["bejegyzes2", "2024.10.13", "kész"], ["bejegyzes3", "2024.11.15", "folyamatban"], ["bejegyzes4", "2024.12.10", "folyamatban"], ["bejegyzes5", "2024.12.20", "folyamatban"], ["bejegyzes6", "2024.12.22", "folyamatban"]]
+    cimek = []
+
+    for csomag in bejegyzes_cim_datum_allapot:
+        cimek.append(csomag[0])
+
+    #adatok = filemanager.Read(username, passwordHash, cim)
+
+    if cim in cimek:
+        #filemanager.Edit(username, passwordHash, adatok[2], "kész")
+        print(f"\nKészre állítottuk a következő bejegyzést: {cim}")
+
+    elif cim not in cimek:
+        print("Nem létezik ilyen bejegyzés")
 
 
 def List(parancs_parameterek): # Bejegyzés | címek listázása |
@@ -127,7 +243,8 @@ def Open(parancs_parameterek): # Kért | bejegyzés megnyitása |
         print(f"  {ListElvalasztoGeneralas()}")
         print(f"\n{bejegyzes_tartalom}")
 
-while True:
+
+while True: # Fő Loop
     user_input = input("\nfelhasználónév --> ")
     user_input = user_input.split(" ")
     user_input[0] = user_input[0].capitalize()
