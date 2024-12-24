@@ -77,15 +77,19 @@ def Decrypt(data: bytes, key: bytes) -> str:
     return decrypted.decode("utf-8")
 
 
-def Store(name: str, key: bytes, title: str, text: str) -> bool:
+def Store(name: str, key: bytes, title: str, text: str, date: str = None, status: bool = False) -> bool:
     pass
 
 
-def Read(name: str, key: bytes, title: str, text: str) -> str:
+def Read(name: str, key: bytes, title: str) -> list:
     pass
 
 
 def Users() -> list:
+    pass
+
+
+def EditProperties(name: str, key: bytes, title: str, newTitle: str = None, newDate: str = None, newStatus: bool = None):
     pass
 
 
