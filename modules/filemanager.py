@@ -5,7 +5,7 @@ def WorkingDir():
     if getattr(sys, 'frozen', False):
         return os.path.dirname(sys.executable)
     else:
-        return os.path.dirname(os.path.abspath(__file__))
+        return os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
 
 
 def SignUp(name, password) -> bool:
@@ -97,16 +97,44 @@ def Read(name: str, key: bytes, title: str) -> list:
     pass
 
 
-def Users() -> list:
+def Users(mode: str = "u") -> list:
+    """Returns the users stored in the program.
+
+    Args:
+        mode (str, optional): The mode sets the type of information returned back: "u"= usernames, "f"= usernames and serial numbers, "s"= serial numbers. Defaults to "u".
+
+    Raises:
+        SyntaxError: Invalid mode is given.
+        SyntaxError: The users.txt has incorrect syntax.
+
+    Returns:
+        list: List of users.
+    """
     import os
     
+    if mode not in ("u", "f", "s"):
+        raise SyntaxError("Invalid mode for filemanager.Users()!")
+    users = []
     inDir = WorkingDir()
     
     with open(os.path.join(inDir, "users", "users.txt"), "r", encoding="utf-8") as f:
-        try:
-            name, serial = f.readline().split(" ")
-        except Exception as e:
-            print(e)
+        reading = True
+        while reading:
+            line = f.readline()
+            if line == "":
+                reading = False
+                
+            else:
+                try:
+                    name, serial = line.strip().split(" ")
+                except Exception as e:
+                    raise SyntaxError("The users.txt was modified and one of the lines has incorrect syntax!")
+
+                if mode == "u": users.append(name)
+                elif mode == "f": users.append((name, serial))
+                else: users.append(serial)
+                
+    return users
 
 
 def EditProperties(name: str, key: bytes, title: str, newTitle: str = None, newDate: str = None, newStatus: bool = None):
