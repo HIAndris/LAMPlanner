@@ -50,9 +50,9 @@ def Help(parancs_parameterk):
     os.system('cls')
 
     for parancs, magyarazat in parancsok.items():
-        print(f"{parancs}\n")
+        print(f"{parancs}")
         print(f"{magyarazat}\n")
-
+        
 def Delete(parancs_parameterek): # Meghívja a fájlkezelés | törlési funkcióját |
     os.system('cls')
     # Itt is bekérjük a címeket 
