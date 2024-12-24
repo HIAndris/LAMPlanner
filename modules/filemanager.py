@@ -1,5 +1,17 @@
+def WorkingDir():
+    import os
+    import sys
+
+    if getattr(sys, 'frozen', False):
+        return os.path.dirname(sys.executable)
+    else:
+        return os.path.dirname(os.path.abspath(__file__))
+
+
 def SignUp(name, password) -> bool:
-    pass
+    inDir = WorkingDir()
+    
+    
 
 
 def LogIn(name, password) -> bool:
@@ -86,7 +98,15 @@ def Read(name: str, key: bytes, title: str) -> list:
 
 
 def Users() -> list:
-    pass
+    import os
+    
+    inDir = WorkingDir()
+    
+    with open(os.path.join(inDir, "users", "users.txt"), "r", encoding="utf-8") as f:
+        try:
+            name, serial = f.readline().split(" ")
+        except Exception as e:
+            print(e)
 
 
 def EditProperties(name: str, key: bytes, title: str, newTitle: str = None, newDate: str = None, newStatus: bool = None):
