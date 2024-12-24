@@ -1,8 +1,8 @@
-import filemanager
 import os
 import datetime
 from datetime import date
 from datetime import datetime
+from modules import filemanager
 
 parancsok = {
     "help":"megjeleníti ezt a felületet.",
