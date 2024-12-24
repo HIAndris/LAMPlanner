@@ -1,8 +1,5 @@
-import filemanager
+from modules import filemanager
 import os
-import datetime
-from datetime import date
-from datetime import datetime
 
 parancsok = {
     "help":"megjeleníti ezt a felületet.",
@@ -230,6 +227,10 @@ def SzuresKesz(bejegyzes_cim_datum_allapot):
 
 
 def SzuresHeti(bejegyzes_cim_datum_allapot):
+    import datetime
+    from datetime import date
+    from datetime import datetime
+    
     megjelenitesi_szamlalo = 0
     print(f"A Héten határidős bejegyzések\n")
     print(f"{ListElvalasztoGeneralas()}")
