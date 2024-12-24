@@ -9,11 +9,11 @@ def WorkingDir():
 
 
 def SignUp(name: str, password: str) -> bool:
-    """Adds a user to the user database and creates a dictionary for them
+    """Adds a user to the user database and creates a dictionary for them.
 
     Args:
-        name (str): the chosen username
-        password (str): the chosen password
+        name (str): username
+        password (str): password
 
     Returns:
         bool: Returns True if the user has been created and returns False and a description if there was a problem during the creation.
@@ -46,8 +46,23 @@ def SignUp(name: str, password: str) -> bool:
 
 
 def LogIn(name: str, password: str) -> bool:
-    pass
+    """Validates a user by checking their username and password.
 
+    Args:
+        name (str): username
+        password (str): password
+
+    Returns:
+        bool: Returns True if the user's username and password are correct and returns False and a description if there is something wrong with the arguments.
+    """
+    
+    if name not in Users():
+        return False, "This user does not exist!"
+    
+    if (name, CreatePasswordHash(password)) not in Users("v"):
+        return False, "The password is incorrect!"
+    
+    return True
 
 def CreatePasswordHash(password: str) -> str:
     """Creates the password hash used to validate a password.
