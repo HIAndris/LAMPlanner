@@ -12,16 +12,19 @@ parancsok = {
     "Egyéb megjegyzések":"Kérjük a dátumokat ÉÉÉÉ.HH.NN formátumban adja meg. példa: 2025.01.01",
 }
 
-def GetUnameGetHash(u_name= "alap_user", hash= "alap_hash"):
-    global username
-    username = u_name
+def GetUnameGetHash(u_name= "alap_user", u_id=0, hash= "alap_hash" ):
+    global userid
+    userid = u_name
 
+    global userid
+    userid = userid
+    
     global passwordHash
     passwordHash = hash
 
 
 def ListElvalasztoGeneralas():
-    # bejegyzes_cimek = filemanager.UserStored(username: str)
+    # bejegyzes_cimek = filemanager.UserStored(userid)
     bejegyzes_cim_datum_allapot = [["bejegyzes1", "2024.10.12", "kész"], ["bejegyzes2", "2024.10.13", "kész"], ["bejegyzes3", "2024.11.15", "folyamatban"], ["bejegyzes4", "2024.12.10", "folyamatban"], ["bejegyzes5", "2024.12.20", "folyamatban"], ["bejegyzes6", "2024.12.22", "folyamatban"]]
     bejegyzes_cimek = []
 
@@ -64,7 +67,7 @@ def Delete(parancs_parameterek): # Meghívja a fájlkezelés | törlési funkci�
 
     if torolendo in cimek:
         print("Töröltük a bejegyzést")
-        filemanager.Delete(username, passwordHash, torolendo)
+        filemanager.Delete(userid, passwordHash, torolendo)
     elif torolendo not in cimek:
         print("Nem található ilyen bejegyzés!")
 
@@ -98,7 +101,7 @@ def Edit(parancs_parameterek): # Meghívja a fájlkezelés | szerkesztési funkc
     for csomag in bejegyzes_cim_datum_allapot:
         cimek.append(csomag[0])
 
-    # adatok = filemanager.Read(username, passwordHash, szerkesztendo) a megfelelő paraméterekkel
+    # adatok = filemanager.Read(userid, passwordHash, szerkesztendo) a megfelelő paraméterekkel
     adatok = ["cim", "2024.01.01", "bejegyzestartalom", "folyamatban"] 
 
     if szerkesztendo in cimek:
@@ -128,7 +131,7 @@ def Edit(parancs_parameterek): # Meghívja a fájlkezelés | szerkesztési funkc
 
 
                 # Ezután továbbítjuk a címet dátumot és a tartalmat rögzítésre
-                #filemanager.Edit(username, passwordHash, cim, datum, bejegyzestartalom, allapot)
+                #filemanager.Edit(userid, passwordHash, cim, datum, bejegyzestartalom, allapot)
             
 
 
@@ -178,7 +181,7 @@ def Create(parancs_parameterek): # Megívja a fájlkezelés | létrehozás funkc
 
 
                 # Ezután továbbítjuk a címet dátumot és a tartalmat rögzítésre
-                #filemanager.Store(username, passwordHash, cim, datum, bejegyzestartalom)
+                #filemanager.Store(userid, passwordHash, cim, datum, bejegyzestartalom)
 
             else:
                 print("\nHelytelenül adta meg a dátumot vagy helytelenül választotta el a bejegyzés elemeit!. Nem mentettük a változásokat")
@@ -261,12 +264,12 @@ def Done(parancs_parameterek):
     for csomag in bejegyzes_cim_datum_allapot:
         cimek.append(csomag[0])
 
-    #adatok = filemanager.Read(username, passwordHash, cim)
+    #adatok = filemanager.Read(userid, passwordHash, cim)
 
     os.system('cls')
 
     if cim in cimek:
-        #filemanager.Edit(username, passwordHash, adatok[2], "kész")
+        #filemanager.Edit(userid, passwordHash, adatok[2], "kész")
         print(f"\nKészre állítottuk a következő bejegyzést: {cim}")
 
     elif cim not in cimek:
@@ -274,7 +277,7 @@ def Done(parancs_parameterek):
 
 
 def List(parancs_parameterek): # Bejegyzés | címek listázása |
-    # bejegyzes_cimek = filemanager.UserStored(username: str)
+    # bejegyzes_cimek = filemanager.UserStored(userid: str)
 
     bejegyzes_cim_datum_allapot = [["bejegyzes1", "2024.10.12", "kész"], ["bejegyzes2", "2024.10.13", "kész"], ["bejegyzes3", "2024.11.15", "folyamatban"], ["bejegyzes4", "2024.12.10", "folyamatban"], ["bejegyzes5", "2024.12.20", "folyamatban"], ["bejegyzes6", "2024.12.22", "folyamatban"]]
 
@@ -304,7 +307,7 @@ def Open(parancs_parameterek): # Kért | bejegyzés megnyitása |
     megnyitando_bejegyzes = parancs_parameterek[1]
     os.system('cls')
     
-    bejegyzes_tartalom = "Általános bejegyzéstartalom Általános bejegyzéstartalom" # Ennek a helyére ez jön majd: filemanager.Read(username: str, passwordHash: b, title: str, text: str) a megfelelő paraméterekkel
+    bejegyzes_tartalom = "Általános bejegyzéstartalom Általános bejegyzéstartalom" # Ennek a helyére ez jön majd: filemanager.Read(userid, passwordHash: b, title: str, text: str) a megfelelő paraméterekkel
     
 
     if megnyitando_bejegyzes != "" and megnyitando_bejegyzes in bejegyzes_cimek:
@@ -315,7 +318,7 @@ def Open(parancs_parameterek): # Kért | bejegyzés megnyitása |
 GetUnameGetHash()
 
 while True: # Fő Loop
-    user_input = input(f"\n{username} --> ")
+    user_input = input(f"\n{userid} --> ")
     user_input = user_input.split(" ")
     user_input[0] = user_input[0].capitalize()
     user_input.append("")
