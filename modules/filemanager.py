@@ -16,17 +16,17 @@ def SignUp(name: str, password: str) -> bool:
         password (str): password
 
     Returns:
-        bool: Returns True if the user has been created and returns False and a description if there was a problem during the creation.
+        bool: Returns True if the user has been created and returns False if there was a problem during the creation.
     """
     import os
     
     inDir = WorkingDir()
     
     if name in Users():
-        return False, "This username already exists!"
+        return False
     
     if "\n" in name:
-        return False, "The name has newline character(s) in it!"
+        return False
     
     passwordHash = CreatePasswordHash(password)
     users = Users("s")
@@ -38,8 +38,8 @@ def SignUp(name: str, password: str) -> bool:
     with open(os.path.join(inDir, "users", "users.txt"), "a", encoding="utf-8") as f:
         f.write(name + " " + str(serial) + " " + passwordHash + "\n")
     
-    os.makedirs(os.path.dirname(inDir, "users", str(serial)), exist_ok = True)
-    with open(os.path.join(inDir, "users", str(serial), "user.hiasecret"), "", encoding="utf-8") as f:
+    os.makedirs(os.path.join(inDir, "users", str(serial)), exist_ok = True)
+    with open(os.path.join(inDir, "users", str(serial), "user.hiasecret"), "w", encoding="utf-8") as f:
         pass
     
     return True
@@ -53,16 +53,51 @@ def LogIn(name: str, password: str) -> bool:
         password (str): password
 
     Returns:
-        bool: Returns True if the user's username and password are correct and returns False and a description if there is something wrong with the arguments.
+        bool: Returns True if the user's username and password are correct and returns False if there is something wrong with the given arguments.
     """
     
     if name not in Users():
-        return False, "This user does not exist!"
+        return False
     
     if (name, CreatePasswordHash(password)) not in Users("v"):
-        return False, "The password is incorrect!"
+        return False
     
     return True
+
+
+def DeleteUser(name: str, password: str):
+    if LogIn(name, password) == False:
+        return False
+    
+    import os
+    import shutil
+    
+    inDir = WorkingDir()
+    with open(os.path.join(inDir, "users", "users.txt"), "r", encoding="utf-8") as f:
+        lines = f.readlines()
+    
+    linesLen = len(lines)
+    i = 0
+    line = lines[i].rsplit(" ", 2)
+    while i <= linesLen and line[0] != name:
+        i += 1
+        line = lines[i]
+    
+    if linesLen < i:
+        raise RuntimeError("Ez vagy bugos, vagy valaki/valami a másodperc töredéke alatt módosított egy fájlt, vagy nem tudom... :3")
+    
+    lines.pop(i)
+    if lines: 
+        lines[-1].strip()
+    
+    with open(os.path.join(inDir, "users", "users.txt"), "w", encoding="utf-8") as f:
+        for line in lines:
+            f.write(line)
+    
+    shutil.rmtree(os.path.join(inDir, "users", line[1]))
+    
+    return True
+
 
 def CreatePasswordHash(password: str) -> str:
     """Creates the password hash used to validate a password.
