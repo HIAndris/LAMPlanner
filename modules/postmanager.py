@@ -1,4 +1,4 @@
-import filemanager
+from modules import filemanager
 import os
 
 parancsok = {
@@ -111,7 +111,7 @@ def Edit(parancs_parameterek): # Meghívja a fájlkezelés | szerkesztési funkc
             cim = "; ".join(bejegyzesadatok) 
             datum_felbontva = datum.split(".")
 
-            if len(datum_felbontva) == 3 and len(datum_felbontva[1]) == 2 and 0 < int(datum_felbontva[1]) <= 31 and 0 < int(datum_felbontva[2]) < 31 and len(datum_felbontva[2]) == 2:
+            if len(datum_felbontva) == 3 and len(datum_felbontva[1]) == 2 and 0 < int(datum_felbontva[1]) <= 12 and 0 < int(datum_felbontva[2]) <= 31 and len(datum_felbontva[2]) == 2:
                 
                 cim, datum, bejegyzestartalom = SzerkesztFelulet(cim, datum, adatok[2])
 
@@ -162,7 +162,7 @@ def Create(parancs_parameterek): # Megívja a fájlkezelés | létrehozás funkc
         print(f"Bejegyzés címe: {cim}, Határidő: {datum}")
 
         if cim not in cimek:
-            if len(datum_felbontva) == 3 and len(datum_felbontva[1]) == 2 and 0 < int(datum_felbontva[1]) <= 31 and 0 < int(datum_felbontva[2]) < 31 and len(datum_felbontva[2]) == 2:
+            if len(datum_felbontva) == 3 and len(datum_felbontva[1]) == 2 and 0 < int(datum_felbontva[1]) <= 12 and 0 < int(datum_felbontva[2]) <= 31 and len(datum_felbontva[2]) == 2:
                 cim, datum, bejegyzestartalom = SzerkesztFelulet(cim, datum)
 
                 print(f"Cím: {cim}, Határidő: {datum}\n")
@@ -232,15 +232,13 @@ def SzuresKesz(bejegyzes_cim_datum_allapot):
 
 
 def SzuresHeti(bejegyzes_cim_datum_allapot):
-    import datetime
-    from datetime import date
     from datetime import datetime
 
     megjelenitesi_szamlalo = 0
     print(f"A Héten határidős bejegyzések\n")
     print(f"{ListElvalasztoGeneralas()}")
 
-    mai_datum = date.today()
+    mai_datum = datetime.today()
     aktualis_het = mai_datum.isocalendar()[1]
 
     for csomag in bejegyzes_cim_datum_allapot:
@@ -280,7 +278,7 @@ def Done(parancs_parameterek):
 def List(parancs_parameterek): # Bejegyzés | címek listázása |
     # bejegyzes_cimek = filemanager.UserStored(username: str)
 
-    bejegyzes_cim_datum_allapot = [["bejegyzes1", "2024.10.12", "kész"], ["bejegyzes2", "2024.10.13", "kész"], ["bejegyzes3", "2024.11.15", "folyamatban"], ["bejegyzes4", "2024.12.10", "folyamatban"], ["bejegyzes5", "2024.12.20", "folyamatban"], ["bejegyzes6", "2024.12.22", "folyamatban"]]
+    bejegyzes_cim_datum_allapot = [["bejegyzes1", "2024.12.27", "kész"], ["bejegyzes2", "2024.12.26", "kész"], ["bejegyzes3", "2024.12.28", "folyamatban"], ["bejegyzes4", "2024.12.10", "folyamatban"], ["bejegyzes5", "2024.12.20", "folyamatban"], ["bejegyzes6", "2024.12.22", "folyamatban"]]
 
     os.system('cls')
 
