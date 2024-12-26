@@ -1,4 +1,4 @@
-from modules import filemanager
+import filemanager
 import os
 
 parancsok = {
@@ -13,11 +13,11 @@ parancsok = {
 }
 
 def GetUnameGetHash(u_name= "alap_user", u_id=0, hash= "alap_hash" ):
-    global userid
-    userid = u_name
+    global username
+    username = u_name
 
     global userid
-    userid = userid
+    userid = u_id
     
     global passwordHash
     passwordHash = hash
@@ -25,7 +25,7 @@ def GetUnameGetHash(u_name= "alap_user", u_id=0, hash= "alap_hash" ):
 
 def ListElvalasztoGeneralas():
     # bejegyzes_cimek = filemanager.UserStored(userid)
-    bejegyzes_cim_datum_allapot = [["bejegyzes1", "2024.10.12", "kész"], ["bejegyzes2", "2024.10.13", "kész"], ["bejegyzes3", "2024.11.15", "folyamatban"], ["bejegyzes4", "2024.12.10", "folyamatban"], ["bejegyzes5", "2024.12.20", "folyamatban"], ["bejegyzes6", "2024.12.22", "folyamatban"]]
+    bejegyzes_cim_datum_allapot = [["bejegyzes1", "2024.10.12", "folyamatban"], ["bejegyzes2", "2024.10.13", "kész"], ["bejegyzes3", "2024.11.15", "folyamatban"], ["bejegyzes4", "2024.12.10", "folyamatban"], ["bejegyzes5", "2024.12.20", "folyamatban"], ["bejegyzes6", "2024.12.22", "folyamatban"]]
     bejegyzes_cimek = []
 
     for csomag in bejegyzes_cim_datum_allapot:
@@ -230,15 +230,13 @@ def SzuresKesz(bejegyzes_cim_datum_allapot):
 
 
 def SzuresHeti(bejegyzes_cim_datum_allapot):
-    import datetime
-    from datetime import date
     from datetime import datetime
 
     megjelenitesi_szamlalo = 0
     print(f"A Héten határidős bejegyzések\n")
     print(f"{ListElvalasztoGeneralas()}")
 
-    mai_datum = date.today()
+    mai_datum = datetime.today()
     aktualis_het = mai_datum.isocalendar()[1]
 
     for csomag in bejegyzes_cim_datum_allapot:
@@ -279,7 +277,7 @@ def Done(parancs_parameterek):
 def List(parancs_parameterek): # Bejegyzés | címek listázása |
     # bejegyzes_cimek = filemanager.UserStored(userid: str)
 
-    bejegyzes_cim_datum_allapot = [["bejegyzes1", "2024.10.12", "kész"], ["bejegyzes2", "2024.10.13", "kész"], ["bejegyzes3", "2024.11.15", "folyamatban"], ["bejegyzes4", "2024.12.10", "folyamatban"], ["bejegyzes5", "2024.12.20", "folyamatban"], ["bejegyzes6", "2024.12.22", "folyamatban"]]
+    bejegyzes_cim_datum_allapot = [["bejegyzes1", "2024.12.26", "kész"], ["bejegyzes2", "2024.12.28", "kész"], ["bejegyzes3", "2024.11.15", "folyamatban"], ["bejegyzes4", "2024.12.10", "folyamatban"], ["bejegyzes5", "2024.12.20", "folyamatban"], ["bejegyzes6", "2024.12.22", "folyamatban"]]
 
     os.system('cls')
 
@@ -318,7 +316,7 @@ def Open(parancs_parameterek): # Kért | bejegyzés megnyitása |
 GetUnameGetHash()
 
 while True: # Fő Loop
-    user_input = input(f"\n{userid} --> ")
+    user_input = input(f"\n{username} --> ")
     user_input = user_input.split(" ")
     user_input[0] = user_input[0].capitalize()
     user_input.append("")
