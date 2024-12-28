@@ -87,8 +87,6 @@ def DeleteUser(name: str, password: str):
         raise RuntimeError("Ez vagy bugos, vagy valaki/valami a másodperc töredéke alatt módosított egy fájlt, vagy nem tudom... :3")
     
     lines.pop(i)
-    if lines: 
-        lines[-1].strip()
     
     with open(os.path.join(inDir, "users", "users.txt"), "w", encoding="utf-8") as f:
         for line in lines:
@@ -187,19 +185,11 @@ def Decrypt(data: bytes, key: bytes) -> str:
     return decrypted.decode("utf-8")
 
 
-def Store(id: str, key: bytes, title: str, text: str, date: str = None, status: bool = False) -> bool:
-    pass
-
-
-def Read(id: str, key: bytes, title: str) -> list:
-    pass
-
-
 def Users(mode: str = "u") -> list:
     """Returns the users stored in the program.
 
     Args:
-        mode (str, optional): The mode sets the type of information returned back: "u"= usernames, "f"= usernames, serial numbers and password hashes, "s"= serial numbers, "v"=usernames and password hashes. Defaults to "u".
+        mode (str, optional): The mode sets the type of information returned back: "u"= usernames, "f"= usernames, serial numbers and password hashes, "s"= serial numbers, "i"= usernames and serial numbers, "v"= usernames and password hashes. Defaults to "u".
 
     Raises:
         SyntaxError: Invalid mode is given.
@@ -210,7 +200,7 @@ def Users(mode: str = "u") -> list:
     """
     import os
     
-    if mode not in ("u", "f", "s", "v"):
+    if mode not in ("u", "f", "s", "i", "v"):
         raise SyntaxError("Invalid mode for filemanager.Users()!")
     users = []
     inDir = WorkingDir()
@@ -231,18 +221,97 @@ def Users(mode: str = "u") -> list:
                 if mode == "u": users.append(name)
                 elif mode == "f": users.append((name, int(serial), passwordHash))
                 elif mode == "s": users.append(int(serial))
+                elif mode == "i": users.append(name, int(serial))
                 else: users.append((name, passwordHash))
                 
     return users
 
 
-def EditProperties(id: str, key: bytes, title: str, newTitle: str = None, newDate: str = None, newStatus: bool = None):
+def GetUserSerial(name: str):
+    users = Users("i")
+    i = 0
+    while users[i][0] != name:
+        i += 1
+    
+    if len(users) == i:
+        return False
+    
+    return users[i][1]
+
+
+def GetUserName(serial: str):
+    users = Users("i")
+    i = 0
+    while users[i][1] != str(serial):
+        i += 1
+    
+    if len(users) == i:
+        return False
+    
+    return users[i][0]
+
+
+def GetUserStored(serial: int, key: bytes, mode: str = "t") -> list:
+    import os
+    
+    inDir = WorkingDir()
+    serialStr = str(serial)
+
+    if serialStr not in os.listdir(os.path.join(inDir, "users")):
+        raise FileNotFoundError("The given user's folder doesn't exist!")
+    
+    if "user.txt" in os.listdir(os.path.join(inDir, "users", serialStr)):
+        with open(os.path.join(inDir, "users", str(serial), "user.txt"), "rb") as f:
+            userTXT = Decrypt(f.read(), key)
+    else:
+        userTXT = ""
+    
+    lines = userTXT.split("\n")
+    if lines[-1] == "":
+        lines.pop(-1)
+    
+    for line in lines:
+        line = line.strip().rsplit(" ", 3)
+    
+    returnLines = []
+    if mode == "t":
+        for line in lines:
+            returnLines.append((line[0]))
+    elif mode == "l":
+        for line in lines:
+            returnLines.append((line[0], line[1], line[2], line[3]))
+    elif mode == "a":
+        returnLines = userTXT
+    
+    return returnLines
+
+
+def Store(serial: int, key: bytes, title: str, text: str, date: str, status: bool = False) -> bool:
+    import os
+    
+    inDir = WorkingDir()
+    serialStr = str(serial)
+    
+    try:
+        userTXT = GetUserStored(serial, key, "a")
+        
+    except:
+        return False
+    
+    postSerial = max()
+    
+    userTXT = "". userTXT + title + " " + postSerial + " " + date + " " + status
+    with open(os.path.join(inDir, "users", serialStr, "user.txt"), "w") as f:
+        f.write()
+
+
+def Read(serial: int, key: bytes, title: str) -> list:
     pass
 
 
-def UserStored(id: str, key: bytes) -> list:
+def EditProperties(serial: int, key: bytes, title: str, newTitle: str = None, newDate: str = None, newStatus: bool = None):
     pass
 
 
-def Delete(id: str, key: bytes, title: str) -> bool:
+def Delete(serial: int, key: bytes, title: str) -> bool:
     pass
