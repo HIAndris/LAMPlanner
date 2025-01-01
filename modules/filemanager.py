@@ -39,7 +39,7 @@ def SignUp(name: str, password: str) -> bool:
         f.write(name + " " + str(serial) + " " + passwordHash + "\n")
     
     os.makedirs(os.path.join(inDir, "users", str(serial)), exist_ok = True)
-    with open(os.path.join(inDir, "users", str(serial), "user.hiasecret"), "w", encoding="utf-8") as f:
+    with open(os.path.join(inDir, "users", str(serial), "user.info"), "w", encoding="utf-8") as f:
         pass
     
     return True
@@ -260,8 +260,8 @@ def GetUserStored(serial: int, key: bytes, mode: str = "t") -> list:
     if serialStr not in os.listdir(os.path.join(inDir, "users")):
         raise FileNotFoundError("The given user's folder doesn't exist!")
     
-    if "user.txt" in os.listdir(os.path.join(inDir, "users", serialStr)):
-        with open(os.path.join(inDir, "users", str(serial), "user.txt"), "rb") as f:
+    if "user.info" in os.listdir(os.path.join(inDir, "users", serialStr)):
+        with open(os.path.join(inDir, "users", str(serial), "user.info"), "rb") as f:
             userTXT = Decrypt(f.read(), key)
     else:
         userTXT = ""
@@ -301,13 +301,16 @@ def Store(serial: int, key: bytes, title: str, text: str, date: str, status: boo
     except:
         return False
     
+    if "\n" in title:
+        return False
+    
     postSerial = max(GetUserStored(serial, key, "s"))
     
     newUserTXT = userTXT + title + " " + postSerial + " " + date + " " + status + "\n"
-    with open(os.path.join(inDir, "users", serialStr, "user.txt"), "wb") as f:
+    with open(os.path.join(inDir, "users", serialStr, "user.info"), "wb") as f:
         f.write(Encrypt(newUserTXT, key))
     
-    with open(os.path.join(inDir, "users", serialStr, postSerial), "wb") as f:
+    with open(os.path.join(inDir, "users", serialStr, postSerial + ".post"), "wb") as f:
         f.write(Encrypt(text, key))
         
     return True
@@ -338,15 +341,97 @@ def Read(serial: int, key: bytes, title: str) -> dict:
     if userTXTLen <= index:
         return {}
     
-    with open(os.path.join(inDir, "users", serialStr, str(line[1])), "rb") as f:
+    with open(os.path.join(inDir, "users", serialStr, str(line[1])) + ".post", "rb") as f:
         text = Decrypt(f.read())
 
     return {"title": line[0], "date": line[2], "status": line[3], "text": text}
     
 
-def EditProperties(serial: int, key: bytes, title: str, newTitle: str = None, newDate: str = None, newStatus: bool = None):
-    pass
+def EditProperties(serial: int, key: bytes, title: str, newTitle: str = None, newDate: str = None, newStatus: bool = None) -> bool:
+    import os
+    
+    inDir = WorkingDir()
+    serialStr = str(serial)
+    
+    try:
+        userTXT = GetUserStored(serial, key, "l")
+        
+    except:
+        return False
+    
+    if 0 == len(userTXT):
+        return False
+    
+    userTXTLen = len(userTXT)
+    line = userTXT[0]
+    index = 1
+    while line[0] != title or index < userTXTLen:
+        line = userTXT[index]
+        index += 1
+    
+    if userTXTLen <= index:
+        return False
+    
+    if "\n" in newTitle:
+        return False
+    
+    if newTitle == None:
+        newTitle = line[0]
+    
+    if newDate == None:
+        newDate = line[2]
+        
+    if newStatus == None:
+        newStatus = line[3]
+    
+    userTXT[index] = (newTitle, line[1], newDate, newStatus)
+    
+    for i in len(userTXT):
+        userTXT[i] = " ".join(userTXT[i]) + "\n"
+    
+    userTXT = "".join(userTXT)
+    
+    with open(os.path.join(inDir, "users", serialStr, "user.info"), "wb") as f:
+        f.write(Encrypt(userTXT, key))
 
+    return True
+    
 
 def Delete(serial: int, key: bytes, title: str) -> bool:
-    pass
+    import os
+    
+    inDir = WorkingDir()
+    serialStr = str(serial)
+    
+    try:
+        userTXT = GetUserStored(serial, key, "l")
+        
+    except:
+        return False
+    
+    if 0 == len(userTXT):
+        return False
+    
+    userTXTLen = len(userTXT)
+    line = userTXT[0]
+    index = 1
+    while line[0] != title or index < userTXTLen:
+        line = userTXT[index]
+        index += 1
+    
+    if userTXTLen <= index:
+        return False
+
+    userTXT.pop(index)
+    
+    for i in len(userTXT):
+        userTXT[i] = " ".join(userTXT[i]) + "\n"
+    
+    userTXT = "".join(userTXT)
+    
+    with open(os.path.join(inDir, "users", serialStr, "user.info"), "wb") as f:
+        f.write(Encrypt(userTXT, key))
+
+    os.remove(os.path.join(inDir, "users", serialStr, str(line[1]) + ".post"))
+    
+    return True
