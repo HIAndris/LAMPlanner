@@ -252,6 +252,19 @@ def GetUserName(serial: str):
 
 
 def GetUserStored(serial: int, key: bytes, mode: str = "t") -> list:
+    """Reads and returns a user's posts and post details.
+
+    Args:
+        serial (int): The user's serial number.
+        key (bytes): The user's encryption key.
+        mode (str, optional): Modifies the information returned. Modes: "t"= titles, "s"= post serial numbers, "ts"= titles and post serial numbers, "l"= all informations in each of the lines (titles, post serial numbers, dates and statuses) "a"= the decrypted user.info file in a single string. Defaults to "t".
+
+    Raises:
+        FileNotFoundError: In case of unexisting user.
+
+    Returns:
+        list: The list of lines in the user.info file decrypted with the amount of details chosen by the mode.
+    """
     import os
     
     inDir = WorkingDir()
@@ -293,6 +306,19 @@ def GetUserStored(serial: int, key: bytes, mode: str = "t") -> list:
 
 
 def Store(serial: int, key: bytes, title: str, text: str, date: str, status: bool = False) -> bool:
+    """Stores a new post.
+
+    Args:
+        serial (int): The user's serial number.
+        key (bytes): The user's encryption key.
+        title (str): The title of the post.
+        text (str): The text in the post.
+        date (str): A date to the post.
+        status (bool, optional): The status of the post. Defaults to False.
+
+    Returns:
+        bool: True if the creation of the post was successful, False if not.
+    """
     import os
     
     inDir = WorkingDir()
@@ -320,6 +346,16 @@ def Store(serial: int, key: bytes, title: str, text: str, date: str, status: boo
 
 
 def Read(serial: int, key: bytes, title: str) -> dict:
+    """Reads and returns a post.
+
+    Args:
+        serial (int): The user's serial number.
+        key (bytes): The user's encryption key.
+        title (str): The title of the post.
+
+    Returns:
+        dict: The dictionary with the post's details and text, returns an empty dictionary if the post was not found or if the user doesn't exist.
+    """
     import os
     
     inDir = WorkingDir()
@@ -351,6 +387,19 @@ def Read(serial: int, key: bytes, title: str) -> dict:
     
 
 def EditProperties(serial: int, key: bytes, title: str, newTitle: str = None, newDate: str = None, newStatus: bool = None) -> bool:
+    """Edits the details of a post.
+
+    Args:
+        serial (int): The user's serial number.
+        key (bytes): The user's encryption key.
+        title (str): The title of the post.
+        newTitle (str, optional): The new title for the post. Defaults to None.
+        newDate (str, optional): The new date for the post. Defaults to None.
+        newStatus (bool, optional): The new status for the post. Defaults to None.
+
+    Returns:
+        bool: True if the post's details has been successfully changed to the new ones, False if not.
+    """
     import os
     
     inDir = WorkingDir()
@@ -401,6 +450,17 @@ def EditProperties(serial: int, key: bytes, title: str, newTitle: str = None, ne
 
 
 def EditText(serial: int, key: bytes, title: str, newText: str) -> bool:
+    """Edits the text of a post.
+
+    Args:
+        serial (int): The user's serial number.
+        key (bytes): The user's encryption key.
+        title (str): The title of the post.
+        newText (str): The new text for the post.
+
+    Returns:
+        bool: True if the post's text has been successfully changed to the new text, False if not.
+    """
     import os
     
     inDir = WorkingDir()
@@ -430,6 +490,16 @@ def EditText(serial: int, key: bytes, title: str, newText: str) -> bool:
 
 
 def Delete(serial: int, key: bytes, title: str) -> bool:
+    """Deletes a post.
+
+    Args:
+        serial (int): The user's serial number.
+        key (bytes): The user's encryption key.
+        title (str): The title of the post.
+
+    Returns:
+        bool: True if the post has been successfully deleted, False if not.
+    """
     import os
     
     inDir = WorkingDir()
