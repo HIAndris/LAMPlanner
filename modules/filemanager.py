@@ -276,10 +276,13 @@ def GetUserStored(serial: int, key: bytes, mode: str = "t") -> list:
     returnLines = []
     if mode == "t":
         for line in lines:
-            returnLines.append((line[0]))
+            returnLines.append(line[0])
+    elif mode == "s":
+        for line in lines:
+            returnLines.append(int(line[1]))
     elif mode == "l":
         for line in lines:
-            returnLines.append((line[0], line[1], line[2], line[3]))
+            returnLines.append((line[0], int(line[1]), line[2], line[3]))
     elif mode == "a":
         returnLines = userTXT
     
@@ -298,16 +301,48 @@ def Store(serial: int, key: bytes, title: str, text: str, date: str, status: boo
     except:
         return False
     
-    postSerial = max()
+    postSerial = max(GetUserStored(serial, key, "s"))
     
-    userTXT = "". userTXT + title + " " + postSerial + " " + date + " " + status
-    with open(os.path.join(inDir, "users", serialStr, "user.txt"), "w") as f:
-        f.write()
+    newUserTXT = userTXT + title + " " + postSerial + " " + date + " " + status + "\n"
+    with open(os.path.join(inDir, "users", serialStr, "user.txt"), "wb") as f:
+        f.write(Encrypt(newUserTXT, key))
+    
+    with open(os.path.join(inDir, "users", serialStr, postSerial), "wb") as f:
+        f.write(Encrypt(text, key))
+        
+    return True
 
 
-def Read(serial: int, key: bytes, title: str) -> list:
-    pass
+def Read(serial: int, key: bytes, title: str) -> dict:
+    import os
+    
+    inDir = WorkingDir()
+    serialStr = str(serial)
+    
+    try:
+        userTXT = GetUserStored(serial, key, "l")
+        
+    except:
+        return {}
+    
+    if 0 == len(userTXT):
+        return {}
+    
+    userTXTLen = len(userTXT)
+    line = userTXT[0]
+    index = 1
+    while line[0] != title or index < userTXTLen:
+        line = userTXT[index]
+        index += 1
+    
+    if userTXTLen <= index:
+        return {}
+    
+    with open(os.path.join(inDir, "users", serialStr, str(line[1])), "rb") as f:
+        text = Decrypt(f.read())
 
+    return {"title": line[0], "date": line[2], "status": line[3], "text": text}
+    
 
 def EditProperties(serial: int, key: bytes, title: str, newTitle: str = None, newDate: str = None, newStatus: bool = None):
     pass
