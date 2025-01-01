@@ -280,6 +280,9 @@ def GetUserStored(serial: int, key: bytes, mode: str = "t") -> list:
     elif mode == "s":
         for line in lines:
             returnLines.append(int(line[1]))
+    elif mode == "ts":
+        for line in lines:
+            returnLines.append((line[0], int(line[1])))
     elif mode == "l":
         for line in lines:
             returnLines.append((line[0], int(line[1]), line[2], line[3]))
@@ -395,7 +398,36 @@ def EditProperties(serial: int, key: bytes, title: str, newTitle: str = None, ne
         f.write(Encrypt(userTXT, key))
 
     return True
+
+
+def EditText(serial: int, key: bytes, title: str, newText: str) -> bool:
+    import os
     
+    inDir = WorkingDir()
+    serialStr = str(serial)
+    
+    try:
+        userTXT = GetUserStored(serial, key, "ts")
+        
+    except:
+        return False
+    
+    if 0 == len(userTXT):
+        return False
+    
+    userTXTLen = len(userTXT)
+    line = userTXT[0]
+    index = 1
+    while line[0] != title or index < userTXTLen:
+        line = userTXT[index]
+        index += 1
+    
+    if userTXTLen <= index:
+        return False
+    
+    with open(os.path.join(inDir, "users", serialStr, str(line[1]) + ".post"), "wb") as f:
+        f.write(Encrypt(newText, key))
+
 
 def Delete(serial: int, key: bytes, title: str) -> bool:
     import os
