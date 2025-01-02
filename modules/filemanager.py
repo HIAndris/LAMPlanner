@@ -221,7 +221,7 @@ def Users(mode: str = "u") -> list:
                 if mode == "u": users.append(name)
                 elif mode == "f": users.append((name, int(serial), passwordHash))
                 elif mode == "s": users.append(int(serial))
-                elif mode == "i": users.append(name, int(serial))
+                elif mode == "i": users.append((name, int(serial)))
                 else: users.append((name, passwordHash))
                 
     return users
@@ -232,8 +232,8 @@ def GetUserSerial(name: str) -> int:
     usersLen = len(users)
     if usersLen == 0:
         raise ValueError("User not found!")
-    
-    i = 1
+
+    i = 0
     while i < usersLen and users[i][0] != name:
         i += 1
     
@@ -259,13 +259,20 @@ def GetUserName(serial: int) -> str:
     return users[i][0]
 
 
+def StrToBool(str: str) -> bool:
+    if str == "True":
+        return True
+    else:
+        return False
+    
+
 def GetUserStored(serial: int, key: bytes, mode: str = "t") -> list:
     """Reads and returns a user's posts and post details.
 
     Args:
         serial (int): The user's serial number.
         key (bytes): The user's encryption key.
-        mode (str, optional): Modifies the information returned. Modes: "t"= titles, "s"= post serial numbers, "ts"= titles and post serial numbers, "l"= all informations in each of the lines (titles, post serial numbers, dates and statuses) "a"= the decrypted user.info file in a single string. Defaults to "t".
+        mode (str, optional): Modifies the information returned. Modes: "t"= titles, "s"= post serial numbers, "ts"= titles and post serial numbers, "l"= all informations in each of the lines (titles, post serial numbers, dates and statuses), "lr"= all informations in each of the lines (titles, post serial numbers in str, dates and statuses), "p"= titles, dates, statuses, "a"= the decrypted user.info file in a single string. Defaults to "t".
 
     Raises:
         FileNotFoundError: In case of unexisting user.
@@ -291,9 +298,9 @@ def GetUserStored(serial: int, key: bytes, mode: str = "t") -> list:
     if lines[-1] == "":
         lines.pop(-1)
     
-    for line in lines:
-        line = line.strip().rsplit(" ", 3)
-    
+    for i in range(len(lines)):
+        lines[i] = lines[i].strip().rsplit(" ", 3)
+
     returnLines = []
     if mode == "t":
         for line in lines:
@@ -306,7 +313,16 @@ def GetUserStored(serial: int, key: bytes, mode: str = "t") -> list:
             returnLines.append((line[0], int(line[1])))
     elif mode == "l":
         for line in lines:
-            returnLines.append((line[0], int(line[1]), line[2], line[3]))
+            returnLines.append((line[0], int(line[1]), line[2], StrToBool(line[3])))
+    elif mode == "p":
+        for line in lines:
+            returnLines.append((line[0], line[2], StrToBool(line[3])))
+    elif mode == "pl":
+        for line in lines:
+            returnLines.append([line[0], line[2], StrToBool(line[3])])
+    elif mode == "lr":
+        for line in lines:
+            returnLines.append((line[0], line[1], line[2], line[3]))
     elif mode == "a":
         returnLines = userTXT
     
@@ -341,9 +357,16 @@ def Store(serial: int, key: bytes, title: str, text: str, date: str, status: boo
     if "\n" in title:
         return False
     
-    postSerial = max(GetUserStored(serial, key, "s"))
+    userStored = GetUserStored(serial, key, "s")
+
+    if 0 < len(userStored):
+        postSerial = max(userStored) + 1
+    else:
+        postSerial = 0
     
-    newUserTXT = userTXT + title + " " + postSerial + " " + date + " " + status + "\n"
+    postSerial = str(postSerial)
+
+    newUserTXT = userTXT + title + " " + postSerial + " " + date + " " + str(status) + "\n"
     with open(os.path.join(inDir, "users", serialStr, "user.info"), "wb") as f:
         f.write(Encrypt(newUserTXT, key))
     
@@ -385,11 +408,11 @@ def Read(serial: int, key: bytes, title: str) -> dict:
         line = userTXT[index]
         index += 1
     
-    if userTXTLen <= index:
+    if userTXTLen < index:
         return {}
     
     with open(os.path.join(inDir, "users", serialStr, str(line[1])) + ".post", "rb") as f:
-        text = Decrypt(f.read())
+        text = Decrypt(f.read(), key)
 
     return {"title": line[0], "date": line[2], "status": line[3], "text": text}
     
@@ -414,7 +437,7 @@ def EditProperties(serial: int, key: bytes, title: str, newTitle: str = None, ne
     serialStr = str(serial)
     
     try:
-        userTXT = GetUserStored(serial, key, "l")
+        userTXT = GetUserStored(serial, key, "lr")
         
     except:
         return False
@@ -429,10 +452,10 @@ def EditProperties(serial: int, key: bytes, title: str, newTitle: str = None, ne
         line = userTXT[index]
         index += 1
     
-    if userTXTLen <= index:
+    if userTXTLen < index:
         return False
     
-    if "\n" in newTitle:
+    if isinstance(newTitle, str) and "\n" in newTitle:
         return False
     
     if newTitle == None:
@@ -444,9 +467,9 @@ def EditProperties(serial: int, key: bytes, title: str, newTitle: str = None, ne
     if newStatus == None:
         newStatus = line[3]
     
-    userTXT[index] = (newTitle, line[1], newDate, newStatus)
+    userTXT[index - 1] = (newTitle, line[1], newDate, str(newStatus))
     
-    for i in len(userTXT):
+    for i in range(len(userTXT)):
         userTXT[i] = " ".join(userTXT[i]) + "\n"
     
     userTXT = "".join(userTXT)
@@ -490,7 +513,7 @@ def EditText(serial: int, key: bytes, title: str, newText: str) -> bool:
         line = userTXT[index]
         index += 1
     
-    if userTXTLen <= index:
+    if userTXTLen < index:
         return False
     
     with open(os.path.join(inDir, "users", serialStr, str(line[1]) + ".post"), "wb") as f:
@@ -514,7 +537,7 @@ def Delete(serial: int, key: bytes, title: str) -> bool:
     serialStr = str(serial)
     
     try:
-        userTXT = GetUserStored(serial, key, "l")
+        userTXT = GetUserStored(serial, key, "lr")
         
     except:
         return False
@@ -529,12 +552,12 @@ def Delete(serial: int, key: bytes, title: str) -> bool:
         line = userTXT[index]
         index += 1
     
-    if userTXTLen <= index:
+    if userTXTLen < index:
         return False
 
-    userTXT.pop(index)
-    
-    for i in len(userTXT):
+    userTXT.pop(index - 1)
+
+    for i in range(len(userTXT)):
         userTXT[i] = " ".join(userTXT[i]) + "\n"
     
     userTXT = "".join(userTXT)
@@ -542,6 +565,6 @@ def Delete(serial: int, key: bytes, title: str) -> bool:
     with open(os.path.join(inDir, "users", serialStr, "user.info"), "wb") as f:
         f.write(Encrypt(userTXT, key))
 
-    os.remove(os.path.join(inDir, "users", serialStr, str(line[1]) + ".post"))
+    os.remove(os.path.join(inDir, "users", serialStr, line[1] + ".post"))
     
     return True
