@@ -227,26 +227,34 @@ def Users(mode: str = "u") -> list:
     return users
 
 
-def GetUserSerial(name: str):
+def GetUserSerial(name: str) -> int:
     users = Users("i")
-    i = 0
-    while users[i][0] != name:
+    usersLen = len(users)
+    if usersLen == 0:
+        raise ValueError("User not found!")
+    
+    i = 1
+    while i < usersLen and users[i][0] != name:
         i += 1
     
     if len(users) == i:
-        return False
+        raise ValueError("User not found!")
     
-    return users[i][1]
+    return int(users[i][1])
 
 
-def GetUserName(serial: str):
+def GetUserName(serial: int) -> str:
     users = Users("i")
-    i = 0
-    while users[i][1] != str(serial):
+    usersLen = len(users)
+    if usersLen == 0:
+        raise ValueError("User not found!")
+    
+    i = 1
+    while i < usersLen and users[i][1] != serial:
         i += 1
     
     if len(users) == i:
-        return False
+        raise ValueError("User not found!")
     
     return users[i][0]
 
@@ -373,7 +381,7 @@ def Read(serial: int, key: bytes, title: str) -> dict:
     userTXTLen = len(userTXT)
     line = userTXT[0]
     index = 1
-    while line[0] != title or index < userTXTLen:
+    while index < userTXTLen and line[0] != title:
         line = userTXT[index]
         index += 1
     
@@ -417,7 +425,7 @@ def EditProperties(serial: int, key: bytes, title: str, newTitle: str = None, ne
     userTXTLen = len(userTXT)
     line = userTXT[0]
     index = 1
-    while line[0] != title or index < userTXTLen:
+    while index < userTXTLen and line[0] != title:
         line = userTXT[index]
         index += 1
     
@@ -478,7 +486,7 @@ def EditText(serial: int, key: bytes, title: str, newText: str) -> bool:
     userTXTLen = len(userTXT)
     line = userTXT[0]
     index = 1
-    while line[0] != title or index < userTXTLen:
+    while index < userTXTLen and line[0] != title:
         line = userTXT[index]
         index += 1
     
@@ -517,7 +525,7 @@ def Delete(serial: int, key: bytes, title: str) -> bool:
     userTXTLen = len(userTXT)
     line = userTXT[0]
     index = 1
-    while line[0] != title or index < userTXTLen:
+    while index < userTXTLen and line[0] != title:
         line = userTXT[index]
         index += 1
     
