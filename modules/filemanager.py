@@ -39,7 +39,7 @@ def SignUp(name: str, password: str) -> bool:
         f.write(name + " " + str(serial) + " " + passwordHash + "\n")
     
     os.makedirs(os.path.join(inDir, "users", str(serial)), exist_ok = True)
-    with open(os.path.join(inDir, "users", str(serial), "user.hiasecret"), "w", encoding="utf-8") as f:
+    with open(os.path.join(inDir, "users", str(serial), "user.info"), "w", encoding="utf-8") as f:
         pass
     
     return True
@@ -87,8 +87,6 @@ def DeleteUser(name: str, password: str):
         raise RuntimeError("Ez vagy bugos, vagy valaki/valami a másodperc töredéke alatt módosított egy fájlt, vagy nem tudom... :3")
     
     lines.pop(i)
-    if lines: 
-        lines[-1].strip()
     
     with open(os.path.join(inDir, "users", "users.txt"), "w", encoding="utf-8") as f:
         for line in lines:
@@ -187,19 +185,11 @@ def Decrypt(data: bytes, key: bytes) -> str:
     return decrypted.decode("utf-8")
 
 
-def Store(id: str, key: bytes, title: str, text: str, date: str = None, status: bool = False) -> bool:
-    pass
-
-
-def Read(id: str, key: bytes, title: str) -> list:
-    pass
-
-
 def Users(mode: str = "u") -> list:
     """Returns the users stored in the program.
 
     Args:
-        mode (str, optional): The mode sets the type of information returned back: "u"= usernames, "f"= usernames, serial numbers and password hashes, "s"= serial numbers, "v"=usernames and password hashes. Defaults to "u".
+        mode (str, optional): The mode sets the type of information returned back: "u"= usernames, "f"= usernames, serial numbers and password hashes, "s"= serial numbers, "i"= usernames and serial numbers, "v"= usernames and password hashes. Defaults to "u".
 
     Raises:
         SyntaxError: Invalid mode is given.
@@ -210,7 +200,7 @@ def Users(mode: str = "u") -> list:
     """
     import os
     
-    if mode not in ("u", "f", "s", "v"):
+    if mode not in ("u", "f", "s", "i", "v"):
         raise SyntaxError("Invalid mode for filemanager.Users()!")
     users = []
     inDir = WorkingDir()
@@ -231,18 +221,319 @@ def Users(mode: str = "u") -> list:
                 if mode == "u": users.append(name)
                 elif mode == "f": users.append((name, int(serial), passwordHash))
                 elif mode == "s": users.append(int(serial))
+                elif mode == "i": users.append(name, int(serial))
                 else: users.append((name, passwordHash))
                 
     return users
 
 
-def EditProperties(id: str, key: bytes, title: str, newTitle: str = None, newDate: str = None, newStatus: bool = None):
-    pass
+def GetUserSerial(name: str):
+    users = Users("i")
+    i = 0
+    while users[i][0] != name:
+        i += 1
+    
+    if len(users) == i:
+        return False
+    
+    return users[i][1]
 
 
-def UserStored(id: str, key: bytes) -> list:
-    pass
+def GetUserName(serial: str):
+    users = Users("i")
+    i = 0
+    while users[i][1] != str(serial):
+        i += 1
+    
+    if len(users) == i:
+        return False
+    
+    return users[i][0]
 
 
-def Delete(id: str, key: bytes, title: str) -> bool:
-    pass
+def GetUserStored(serial: int, key: bytes, mode: str = "t") -> list:
+    """Reads and returns a user's posts and post details.
+
+    Args:
+        serial (int): The user's serial number.
+        key (bytes): The user's encryption key.
+        mode (str, optional): Modifies the information returned. Modes: "t"= titles, "s"= post serial numbers, "ts"= titles and post serial numbers, "l"= all informations in each of the lines (titles, post serial numbers, dates and statuses) "a"= the decrypted user.info file in a single string. Defaults to "t".
+
+    Raises:
+        FileNotFoundError: In case of unexisting user.
+
+    Returns:
+        list: The list of lines in the user.info file decrypted with the amount of details chosen by the mode.
+    """
+    import os
+    
+    inDir = WorkingDir()
+    serialStr = str(serial)
+
+    if serialStr not in os.listdir(os.path.join(inDir, "users")):
+        raise FileNotFoundError("The given user's folder doesn't exist!")
+    
+    if "user.info" in os.listdir(os.path.join(inDir, "users", serialStr)):
+        with open(os.path.join(inDir, "users", str(serial), "user.info"), "rb") as f:
+            userTXT = Decrypt(f.read(), key)
+    else:
+        userTXT = ""
+    
+    lines = userTXT.split("\n")
+    if lines[-1] == "":
+        lines.pop(-1)
+    
+    for line in lines:
+        line = line.strip().rsplit(" ", 3)
+    
+    returnLines = []
+    if mode == "t":
+        for line in lines:
+            returnLines.append(line[0])
+    elif mode == "s":
+        for line in lines:
+            returnLines.append(int(line[1]))
+    elif mode == "ts":
+        for line in lines:
+            returnLines.append((line[0], int(line[1])))
+    elif mode == "l":
+        for line in lines:
+            returnLines.append((line[0], int(line[1]), line[2], line[3]))
+    elif mode == "a":
+        returnLines = userTXT
+    
+    return returnLines
+
+
+def Store(serial: int, key: bytes, title: str, text: str, date: str, status: bool = False) -> bool:
+    """Stores a new post.
+
+    Args:
+        serial (int): The user's serial number.
+        key (bytes): The user's encryption key.
+        title (str): The title of the post.
+        text (str): The text in the post.
+        date (str): A date to the post.
+        status (bool, optional): The status of the post. Defaults to False.
+
+    Returns:
+        bool: True if the creation of the post was successful, False if not.
+    """
+    import os
+    
+    inDir = WorkingDir()
+    serialStr = str(serial)
+    
+    try:
+        userTXT = GetUserStored(serial, key, "a")
+        
+    except:
+        return False
+    
+    if "\n" in title:
+        return False
+    
+    postSerial = max(GetUserStored(serial, key, "s"))
+    
+    newUserTXT = userTXT + title + " " + postSerial + " " + date + " " + status + "\n"
+    with open(os.path.join(inDir, "users", serialStr, "user.info"), "wb") as f:
+        f.write(Encrypt(newUserTXT, key))
+    
+    with open(os.path.join(inDir, "users", serialStr, postSerial + ".post"), "wb") as f:
+        f.write(Encrypt(text, key))
+        
+    return True
+
+
+def Read(serial: int, key: bytes, title: str) -> dict:
+    """Reads and returns a post.
+
+    Args:
+        serial (int): The user's serial number.
+        key (bytes): The user's encryption key.
+        title (str): The title of the post.
+
+    Returns:
+        dict: The dictionary with the post's details and text, returns an empty dictionary if the post was not found or if the user doesn't exist.
+    """
+    import os
+    
+    inDir = WorkingDir()
+    serialStr = str(serial)
+    
+    try:
+        userTXT = GetUserStored(serial, key, "l")
+        
+    except:
+        return {}
+    
+    if 0 == len(userTXT):
+        return {}
+    
+    userTXTLen = len(userTXT)
+    line = userTXT[0]
+    index = 1
+    while line[0] != title or index < userTXTLen:
+        line = userTXT[index]
+        index += 1
+    
+    if userTXTLen <= index:
+        return {}
+    
+    with open(os.path.join(inDir, "users", serialStr, str(line[1])) + ".post", "rb") as f:
+        text = Decrypt(f.read())
+
+    return {"title": line[0], "date": line[2], "status": line[3], "text": text}
+    
+
+def EditProperties(serial: int, key: bytes, title: str, newTitle: str = None, newDate: str = None, newStatus: bool = None) -> bool:
+    """Edits the details of a post.
+
+    Args:
+        serial (int): The user's serial number.
+        key (bytes): The user's encryption key.
+        title (str): The title of the post.
+        newTitle (str, optional): The new title for the post. Defaults to None.
+        newDate (str, optional): The new date for the post. Defaults to None.
+        newStatus (bool, optional): The new status for the post. Defaults to None.
+
+    Returns:
+        bool: True if the post's details has been successfully changed to the new ones, False if not.
+    """
+    import os
+    
+    inDir = WorkingDir()
+    serialStr = str(serial)
+    
+    try:
+        userTXT = GetUserStored(serial, key, "l")
+        
+    except:
+        return False
+    
+    if 0 == len(userTXT):
+        return False
+    
+    userTXTLen = len(userTXT)
+    line = userTXT[0]
+    index = 1
+    while line[0] != title or index < userTXTLen:
+        line = userTXT[index]
+        index += 1
+    
+    if userTXTLen <= index:
+        return False
+    
+    if "\n" in newTitle:
+        return False
+    
+    if newTitle == None:
+        newTitle = line[0]
+    
+    if newDate == None:
+        newDate = line[2]
+        
+    if newStatus == None:
+        newStatus = line[3]
+    
+    userTXT[index] = (newTitle, line[1], newDate, newStatus)
+    
+    for i in len(userTXT):
+        userTXT[i] = " ".join(userTXT[i]) + "\n"
+    
+    userTXT = "".join(userTXT)
+    
+    with open(os.path.join(inDir, "users", serialStr, "user.info"), "wb") as f:
+        f.write(Encrypt(userTXT, key))
+
+    return True
+
+
+def EditText(serial: int, key: bytes, title: str, newText: str) -> bool:
+    """Edits the text of a post.
+
+    Args:
+        serial (int): The user's serial number.
+        key (bytes): The user's encryption key.
+        title (str): The title of the post.
+        newText (str): The new text for the post.
+
+    Returns:
+        bool: True if the post's text has been successfully changed to the new text, False if not.
+    """
+    import os
+    
+    inDir = WorkingDir()
+    serialStr = str(serial)
+    
+    try:
+        userTXT = GetUserStored(serial, key, "ts")
+        
+    except:
+        return False
+    
+    if 0 == len(userTXT):
+        return False
+    
+    userTXTLen = len(userTXT)
+    line = userTXT[0]
+    index = 1
+    while line[0] != title or index < userTXTLen:
+        line = userTXT[index]
+        index += 1
+    
+    if userTXTLen <= index:
+        return False
+    
+    with open(os.path.join(inDir, "users", serialStr, str(line[1]) + ".post"), "wb") as f:
+        f.write(Encrypt(newText, key))
+
+
+def Delete(serial: int, key: bytes, title: str) -> bool:
+    """Deletes a post.
+
+    Args:
+        serial (int): The user's serial number.
+        key (bytes): The user's encryption key.
+        title (str): The title of the post.
+
+    Returns:
+        bool: True if the post has been successfully deleted, False if not.
+    """
+    import os
+    
+    inDir = WorkingDir()
+    serialStr = str(serial)
+    
+    try:
+        userTXT = GetUserStored(serial, key, "l")
+        
+    except:
+        return False
+    
+    if 0 == len(userTXT):
+        return False
+    
+    userTXTLen = len(userTXT)
+    line = userTXT[0]
+    index = 1
+    while line[0] != title or index < userTXTLen:
+        line = userTXT[index]
+        index += 1
+    
+    if userTXTLen <= index:
+        return False
+
+    userTXT.pop(index)
+    
+    for i in len(userTXT):
+        userTXT[i] = " ".join(userTXT[i]) + "\n"
+    
+    userTXT = "".join(userTXT)
+    
+    with open(os.path.join(inDir, "users", serialStr, "user.info"), "wb") as f:
+        f.write(Encrypt(userTXT, key))
+
+    os.remove(os.path.join(inDir, "users", serialStr, str(line[1]) + ".post"))
+    
+    return True
