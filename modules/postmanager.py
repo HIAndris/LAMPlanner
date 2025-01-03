@@ -103,19 +103,21 @@ def Edit(parancs_parameterek): # Meghívja a fájlkezelés | szerkesztési funkc
             cim = "; ".join(bejegyzesadatok) 
             datum_felbontva = datum.split(".")
 
-            if len(datum_felbontva) == 3 and len(datum_felbontva[1]) == 2 and 0 < int(datum_felbontva[1]) <= 12 and 0 < int(datum_felbontva[2]) <= 31 and len(datum_felbontva[2]) == 2:
-                
+            if len(datum_felbontva) == 3 and len(datum_felbontva[1]) == 2 and 0 < int(datum_felbontva[1]) <= 12 and 0 < int(datum_felbontva[2]) <= 31 and len(datum_felbontva[2]) == 2 and int(datum_felbontva[0]) > 0:
                 cim, datum, bejegyzestartalom = SzerkesztFelulet(cim, datum, adatok["status"])
 
                 print(f"Új Cím: {cim}, Új Dátum: {datum}\n")
                 print(bejegyzestartalom)
 
-                print("------------------------\nBejegyzését rögzítettük.")
-
-
                 # Ezután továbbítjuk a címet dátumot és a tartalmat rögzítésre
+
                 filemanager.EditProperties(userid, decryption_key, cim, cim, datum)
                 filemanager.EditText(userid, decryption_key, cim, bejegyzestartalom)
+
+
+                print("------------------------\nBejegyzését rögzítettük.")
+                print("Nem található ilyen bejegyzés")        
+                
             
 
 
@@ -129,7 +131,7 @@ def Edit(parancs_parameterek): # Meghívja a fájlkezelés | szerkesztési funkc
         except ValueError:
             print("Helytelenül volt megadva a parancs. Nem mentettük a változásokat")
     
-    elif adatok[0] not in cimek:
+    else:
         print("Nem létezik ilyen bejegyzés")
 
 def Create(parancs_parameterek): # Megívja a fájlkezelés | létrehozás funkcióját |
@@ -150,7 +152,7 @@ def Create(parancs_parameterek): # Megívja a fájlkezelés | létrehozás funkc
         print(f"Bejegyzés címe: {cim}, Határidő: {datum}")
 
         if cim not in cimek:
-            if len(datum_felbontva) == 3 and len(datum_felbontva[1]) == 2 and 0 < int(datum_felbontva[1]) <= 12 and 0 < int(datum_felbontva[2]) <= 31 and len(datum_felbontva[2]) == 2:
+            if len(datum_felbontva) == 3 and len(datum_felbontva[1]) == 2 and 0 < int(datum_felbontva[1]) <= 12 and 0 < int(datum_felbontva[2]) <= 31 and len(datum_felbontva[2]) == 2 and int(datum_felbontva[0]) > 0:
                 cim, datum, bejegyzestartalom = SzerkesztFelulet(cim, datum)
 
                 print(f"Cím: {cim}, Határidő: {datum}\n")
@@ -233,12 +235,14 @@ def SzuresHeti(bejegyzes_cim_datum_allapot):
     print(f"{ListElvalasztoGeneralas()}")
 
     mai_datum = datetime.today()
+    aktualis_ev = datetime.today().year
     aktualis_het = mai_datum.isocalendar()[1]
 
     for csomag in bejegyzes_cim_datum_allapot:
         csomag_het = datetime.strptime(csomag[1], "%Y.%m.%d").date().isocalendar()[1]
+        csomag_ev = datetime.strptime(csomag[1], "%Y.%m.%d").date().year
 
-        if aktualis_het == csomag_het:
+        if aktualis_het == csomag_het and csomag_ev == aktualis_ev:
             BiztonsagosPrint(csomag)
             megjelenitesi_szamlalo += 1
 
