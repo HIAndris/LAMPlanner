@@ -33,8 +33,6 @@ def LogIn():
             os.system("cls")
             print("Nem létezik ilyen felhasználó!\n------------------------------\n")
 
-    return "", "", False
-
 
 def SignUp():
     pass

@@ -9,16 +9,20 @@ username = ""
 
 while running:
     if not loggedIn:
+        print("")
+
         os.system("cls")
         choice = input("Nincs bejelentkezve --> ")
 
         if choice == "login":
             os.system("cls")
             username, password, loggedIn = usermanager.LogIn()
-        if choice == "delete":
+        elif choice == "delete":
             os.system("cls")
             usermanager.Delete()
-        if choice == "exit":
+        elif choice == "signup":
+            username, password, loggedIn = usermanager.SignUp()
+        elif choice == "exit":
             break
     
     if loggedIn:
