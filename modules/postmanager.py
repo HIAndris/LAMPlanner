@@ -311,12 +311,8 @@ def Open(parancs_parameterek): # Kért | bejegyzés megnyitása |
         print(f"{ListElvalasztoGeneralas()}")
         print(f"\n{bejegyzes_tartalom}")
 
-def MainLoop():
+def MainLoop(user_input):
         # Fő Loop
-        user_input = input(f"\n{username} --> ")
-        user_input = user_input.split(" ", 1)
-        user_input[0] = user_input[0].capitalize()
-        user_input.append("")
 
         try:
             eval(user_input[0] + f"({user_input})")
