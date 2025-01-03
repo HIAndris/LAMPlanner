@@ -1,9 +1,10 @@
 import os
+import filemanager
 
 USER_DATA_FILE = "users.txt"
 
 def Load_Users(): #felhasználói adatok betöltése
-  users = {}
+    users = {}
     if os.path.exists(USER_DATA_FILE):
         with open(USER_DATA_FILE, "r") as file:
             for line in file:
@@ -14,10 +15,10 @@ def Load_Users(): #felhasználói adatok betöltése
     return users
 
 def Delete_Users(): #felhasználói adatok törlése
-      print("Felhasználó törlési felület")
+    print("Felhasználó törlési felület")
     username = input("Adja meg a törlendő felhasználó nevét: ")
 
-    users = load_users()
+    users = Load_Users()
 
     #ellenőrizzük, hogy létezik-e a felhasználó
     if username not in users:
@@ -25,51 +26,51 @@ def Delete_Users(): #felhasználói adatok törlése
         return False
 
     #törlés
-    del users[username]
-    save_users(users)
+    success = filemanager.DeleteUser(username, users[username]["password"])  #meghívjuk a DeleteUser alprogramot
+    if success:
+        print(f"A(z) {username} felhasználó sikeresen törlésre került!")
+    else:
+        print("A felhasználó törlése nem sikerült.")
     
-    print(f"A(z) {username} felhasználó sikeresen törlésre került!")
-    return True
+    return success
 
 def Register(): #regisztrációs felület és folyamat létrehozása
-  print("Regisztrációs felület")
+    print("Regisztrációs felület")
     username = input("Adja meg a felhasználónevét: ")
     password = input("Adja meg a jelszavát: ")
     other_data = input("Adjon meg egyéb adatokat (pl. email, telefonszám): ")
 
-    users = Load_users()
+    users = Load_Users()
 
-#ellenőrizzük, hogy már létezik-e ilyen felhasználónév
+    #ellenőrizzük, hogy már létezik-e ilyen felhasználónév
     if username in users:
         print("Ez a felhasználónév már foglalt.")
         return False
 
     #felhasználó adatainak mentése
-    users[username] = {"password": password, "other_data": other_data}
-    save_users(users)
+    success = filemanager.SignUp(username, password)  #meghívjuk a SignUp alprogramot
+    if success:
+        print("Sikeres regisztráció!")
+    else:
+        print("A regisztráció nem sikerült.")
     
-    print("Sikeres regisztráció!")
-    return True
+    return success
 
 def Login(): #bejelentkezési felület és folyamat létrehozása
-   print("Bejelentkezési felület")
+    print("Bejelentkezési felület")
     username = input("Adja meg a felhasználónevét: ")
     password = input("Adja meg a jelszavát: ")
 
-    users = load_users()
+    success = filemanager.LogIn(username, password)  #meghívjuk a LogIn alprogramot
+    if success:
+        print("Sikeres bejelentkezés!")
+    else:
+        print("Hibás felhasználónév vagy jelszó!")
+    
+    return success
 
-    #ellenőrizzük a felhasználói adatokat
-    if username not in users:
-        print("Felhasználónév nem található!")
-        return False
-
-    #ellenőrizzük a jelszót
-    if users[username]["password"] != password:
-        print("Hibás jelszó!")
-        return False
-      
 def Main(): #regisztrációs, bejelentkezési és törlési felület kiválasztása, main programegység
-  while True:
+    while True:
         print("\nVálasszon egy lehetőséget:")
         print("1. Regisztráció")
         print("2. Bejelentkezés")
@@ -79,15 +80,15 @@ def Main(): #regisztrációs, bejelentkezési és törlési felület kiválaszt�
         choice = input("Választás (1/2/3/4): ")
         
         if choice == "1":
-            success = register()
+            success = Register()
             if not success:
                 print("A regisztráció nem sikerült. Próbálja újra.")
         elif choice == "2":
-            success = login()
+            success = Login()
             if not success:
                 print("A bejelentkezés nem sikerült. Próbálja újra.")
         elif choice == "3":
-            success = delete_user()
+            success = Delete_Users()
             if not success:
                 print("A felhasználó törlése nem sikerült. Próbálja újra.")
         elif choice == "4":
@@ -97,4 +98,4 @@ def Main(): #regisztrációs, bejelentkezési és törlési felület kiválaszt�
             print("Érvénytelen választás, próbálja újra.")
 
 if __name__ == "__main__":
-    main()
+    Main()
