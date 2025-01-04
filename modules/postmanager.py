@@ -6,7 +6,7 @@ os.system('cls')
 parancsok = {
     "help":"megjeleníti ezt a felületet.",
     "delete":"töröl egy fájlt név szerint. használat: delete [bejegyzéscím]",
-    "edit":"szerkeszt név szerint egy üzenetet. használat: edit [bejegyzéscím], ezután adja az új címet és a bejegyzés új tartalmát: [bejegyzéscím]; [határidő] ezután a szerkesztőfelületen adja meg a bejegyzés taralmát",
+    "edit":"szerkeszt cím szerint egy bejegyzést. használat: edit [bejegyzéscím], ezután adja az új címet és a bejegyzés új tartalmát: [bejegyzéscím]; [határidő] ezután a szerkesztőfelületen adja meg a bejegyzés taralmát",
     "create":"létrehoz egy új bejegyzést. használat: create [bejegyzéscím]; [határidő] ezután a szerkesztőfelületen rögzítheti a bejegyzés tartalmát",
     "list":"listázza az összes bejegyzést használata: list [szűrés] szűrési lehetőségek: kész(a készen lévő bejegyzések) folyamatban(a folyamatban lévő bejegyzések) heti(a héten esedékes/határidős bejegyzések) a szűrési érték list után írásával csak a szűrésnek megfelelő bejegyzések jelennek majd meg",
     "open":"megnyit egy bejegyzést cím alapján használata: open [bejegyzéscím]",
