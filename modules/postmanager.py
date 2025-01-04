@@ -6,7 +6,7 @@ os.system('cls')
 parancsok = {
     "help":"megjeleníti ezt a felületet.",
     "delete":"töröl egy fájlt név szerint. használat: delete [bejegyzéscím]",
-    "edit":"szerkeszt név szerint egy üzenetet. használat: edit [bejegyzéscím], ezután adja az új címet és a bejegyzés új tartalmát: [bejegyzéscím]; [határidő] ezután a szerkesztőfelületen adja meg a bejegyzés taralmát",
+    "edit":"szerkeszt cím szerint egy bejegyzést. használat: edit [bejegyzéscím], ezután adja az új címet és a bejegyzés új határidejét: [bejegyzéscím]; [határidő] ezután a szerkesztőfelületen adja meg a bejegyzés új taralmát",
     "create":"létrehoz egy új bejegyzést. használat: create [bejegyzéscím]; [határidő] ezután a szerkesztőfelületen rögzítheti a bejegyzés tartalmát",
     "list":"listázza az összes bejegyzést használata: list [szűrés] szűrési lehetőségek: kész(a készen lévő bejegyzések) folyamatban(a folyamatban lévő bejegyzések) heti(a héten esedékes/határidős bejegyzések) a szűrési érték list után írásával csak a szűrésnek megfelelő bejegyzések jelennek majd meg",
     "open":"megnyit egy bejegyzést cím alapján használata: open [bejegyzéscím]",
@@ -105,24 +105,25 @@ def Edit(parancs_parameterek): # Meghívja a fájlkezelés | szerkesztési funkc
             datum_felbontva = datum.split(".")
 
             if len(datum_felbontva) == 3 and len(datum_felbontva[1]) == 2 and 0 < int(datum_felbontva[1]) <= 12 and 0 < int(datum_felbontva[2]) <= 31 and len(datum_felbontva[2]) == 2 and int(datum_felbontva[0]) > 0:
-                cim, datum, bejegyzestartalom = SzerkesztFelulet(cim, datum, adatok["status"])
+                if cim not in cimek:
+                    cim, datum, bejegyzestartalom = SzerkesztFelulet(cim, datum, adatok["status"])
 
-                print(f"Új Cím: {cim}, Új Dátum: {datum}\n")
-                print(bejegyzestartalom)
+                    print(f"Új Cím: {cim}, Új Dátum: {datum}\n")
+                    print(bejegyzestartalom)
 
-                # Ezután továbbítjuk a címet dátumot és a tartalmat rögzítésre
+                    # Ezután továbbítjuk a címet dátumot és a tartalmat rögzítésre
 
-                filemanager.EditProperties(userid, decryption_key, cim, cim, datum)
-                filemanager.EditText(userid, decryption_key, cim, bejegyzestartalom)
+                    filemanager.EditProperties(userid, decryption_key, adatok['title'], cim, datum)
+                    filemanager.EditText(userid, decryption_key, cim, bejegyzestartalom)
 
-                print("------------------------\nBejegyzését rögzítettük.")
+                    print("------------------------\nBejegyzését rögzítettük.")
+                else:
+                    print("Már létezik ilyen nevű bejegyzés")
 
 
             else:
                 print("\nHelytelenül adta meg a dátumot vagy helytelenül választotta el a bejegyzés elemeit! Nem mentettük a változásokat.")
 
-        except IndexError:
-            print("\nHelytelen volt a bejegyzés elemeinek elválasztása. Nem mentettük a változásokat.")
 
         except ValueError:
             print("Helytelenül volt megadva a parancs. Nem mentettük a változásokat.")
@@ -309,12 +310,14 @@ def Open(parancs_parameterek): # Kért | bejegyzés megnyitása |
 
 def MainLoop(user_input):
         # Fő Loop
-
+        
         try:
             eval(user_input[0] + f"({user_input})")
 
         except NameError as e:
-            print(f"Helytelen volt az input ({e})")
+            os.system("cls")
+            print(f"Helytelen volt az input. ({e})")
 
-        except ValueError:
-            print("Helytelen volt az input")
+        except ValueError as e:
+            os.system("cls")
+            print(f"Helytelen volt az input. ({e})")
