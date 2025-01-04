@@ -27,12 +27,10 @@ def GetUnameGetHash(u_name, u_password):
 
 
 def ListElvalasztoGeneralas():
-    bejegyzes_cimek = filemanager.GetUserStored(userid, decryption_key)
-
     elvalaszto = ""
 
     for _ in range(os.get_terminal_size().columns):
-        elvalaszto += "─"
+        elvalaszto += "-"
 
     return elvalaszto
 
@@ -40,8 +38,9 @@ def Help(parancs_parameterk):
     os.system('cls')
 
     for parancs, magyarazat in parancsok.items():
-        print(f"{parancs}")
-        print(f"{magyarazat}\n")
+        print(f"{parancs}:")
+        print(f"{magyarazat}")
+        print(ListElvalasztoGeneralas(), end="")
         
 def Delete(parancs_parameterek): # Meghívja a fájlkezelés | törlési funkcióját |
     os.system('cls')
@@ -50,10 +49,13 @@ def Delete(parancs_parameterek): # Meghívja a fájlkezelés | törlési funkci�
     torolendo = parancs_parameterek[1]
 
     if torolendo in cimek:
-        print("Töröltük a bejegyzést")
-        filemanager.Delete(userid, decryption_key, torolendo)
+        if input(f"\nBiztosan törölni akaja a(z) {torolendo} nevű bejegyzést? (igen/nem) --> ") == "igen":
+            print("Töröltük a bejegyzést.")
+            filemanager.Delete(userid, decryption_key, torolendo)
+        else:
+            print("Nem töröltük a bejegyzést.")
     elif torolendo not in cimek:
-        print("Nem található ilyen bejegyzés!")
+        print("Nem található ilyen bejegyzés.")
 
 def SzerkesztFelulet(cim, datum, bejegyzestartalom=""):
     bejegyzestartalom = ""
@@ -78,7 +80,6 @@ def Edit(parancs_parameterek): # Meghívja a fájlkezelés | szerkesztési funkc
 
     szerkesztendo = parancs_parameterek[1]
 
-    # Itt is bekérjük a címeket 
     bejegyzes_cim_datum_allapot = filemanager.GetUserStored(userid, decryption_key, "p")
     cimek = []
 
@@ -114,25 +115,20 @@ def Edit(parancs_parameterek): # Meghívja a fájlkezelés | szerkesztési funkc
                 filemanager.EditProperties(userid, decryption_key, cim, cim, datum)
                 filemanager.EditText(userid, decryption_key, cim, bejegyzestartalom)
 
-
                 print("------------------------\nBejegyzését rögzítettük.")
-                print("Nem található ilyen bejegyzés")        
-                
-            
-
 
 
             else:
-                print("\nHelytelenül adta meg a dátumot vagy helytelenül választotta el a bejegyzés elemeit! Nem mentettük a változásokat")
+                print("\nHelytelenül adta meg a dátumot vagy helytelenül választotta el a bejegyzés elemeit! Nem mentettük a változásokat.")
 
         except IndexError:
-            print("\nHelytelen volt a bejegyzés elemeinek elválasztása. Nem mentettük a változásokat")
+            print("\nHelytelen volt a bejegyzés elemeinek elválasztása. Nem mentettük a változásokat.")
 
         except ValueError:
-            print("Helytelenül volt megadva a parancs. Nem mentettük a változásokat")
+            print("Helytelenül volt megadva a parancs. Nem mentettük a változásokat.")
     
     else:
-        print("Nem létezik ilyen bejegyzés")
+        print("Nem létezik ilyen bejegyzés.")
 
 def Create(parancs_parameterek): # Megívja a fájlkezelés | létrehozás funkcióját |
     # Itt is bekérjük a címeket 
@@ -158,11 +154,11 @@ def Create(parancs_parameterek): # Megívja a fájlkezelés | létrehozás funkc
                 print(f"Cím: {cim}, Határidő: {datum}\n")
                 print(bejegyzestartalom)
 
-                print("------------------------\nBejegyzését rögzítettük.")
-
-
                 # Ezután továbbítjuk a címet dátumot és a tartalmat rögzítésre
                 filemanager.Store(userid, decryption_key, cim, bejegyzestartalom, datum)
+
+                print("------------------------\nBejegyzését rögzítettük.")
+                
 
             else:
                 print("\nHelytelenül adta meg a dátumot vagy helytelenül választotta el a bejegyzés elemeit!. Nem mentettük a változásokat")

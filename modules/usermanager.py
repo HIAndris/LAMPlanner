@@ -99,6 +99,7 @@ def LogIn():
             os.system("cls")
             print(f"Nem létezik {username} felhasználó!\n{ElvalasztoGeneralas()}")
 
+    os.system("cls")
     return "", "", False
 
 
@@ -110,10 +111,12 @@ def SignUp():
     correct = False
     os.system("cls")
     while not correct:
+        print("Figyelem! A felhasználónevet és a jelszót nem lehet később megváltoztatni! Elfelejtett jelszó esetén nem lehetséges a felhasználó visszaállítása!\n" + "-" * os.get_terminal_size().columns)
         name = input("Felhasználónév (hagyja üresen a visszalépéshez) --> ")
         nameLen = len(name)
 
         if name == "":
+            os.system("cls")
             return "", "", False
 
         elif name in users:
@@ -157,7 +160,7 @@ def Delete():
 
         os.system("cls")
 
-        if input(f"\nBiztosan törölni akaja a {username} nevű fiókot? (igen/nem) --> ") == "igen":
+        if input(f"\nBiztosan törölni akaja a(z) {username} nevű fiókot? (igen/nem) --> ") == "igen":
             deleted = filemanager.DeleteUser(username, password)
 
             if deleted:
@@ -177,5 +180,5 @@ def Delete():
 
     else:
         os.system("cls")
-        print(f"Nem létezik {username} felhasználó!\n{ElvalasztoGeneralas()}")
+        print(f"Nem létezik {username} nevű felhasználó!\n{ElvalasztoGeneralas()}")
         Delete()
