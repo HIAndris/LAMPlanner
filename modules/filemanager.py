@@ -70,7 +70,6 @@ def DeleteUser(name: str, password: str):
         return False
     
     import os
-    import shutil
     
     inDir = WorkingDir()
     with open(os.path.join(inDir, "users", "users.txt"), "r", encoding="utf-8") as f:
@@ -81,18 +80,21 @@ def DeleteUser(name: str, password: str):
     line = lines[i].rsplit(" ", 2)
     while i <= linesLen and line[0] != name:
         i += 1
-        line = lines[i]
-    
+        line = lines[i].rsplit(" ", 2)
+
     if linesLen < i:
         raise RuntimeError("Ez vagy bugos, vagy valaki/valami a másodperc töredéke alatt módosított egy fájlt, vagy nem tudom... :3")
     
     lines.pop(i)
     
     with open(os.path.join(inDir, "users", "users.txt"), "w", encoding="utf-8") as f:
-        for line in lines:
-            f.write(line)
+        for l in lines:
+            f.write(l)
     
-    shutil.rmtree(os.path.join(inDir, "users", line[1]))
+    if os.name == "nt":
+        os.system("rmdir /s /q " + str(os.path.join(inDir, 'users', line[1])))
+    else:
+        os.system("rm -rf " + str(os.path.join(inDir, 'users', line[1])))
     
     return True
 
