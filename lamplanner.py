@@ -9,8 +9,6 @@ username = ""
 
 while running:
     if not loggedIn:
-        print("")
-
         os.system("cls")
         choice = input("Nincs bejelentkezve --> ")
 
