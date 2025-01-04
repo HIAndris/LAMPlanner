@@ -17,8 +17,9 @@ while running:
             os.system("cls")
             username, password, loggedIn = usermanager.LogIn()
 
-            postmanager.GetUnameGetHash(username, password)
-            password = ""
+            if loggedIn:
+                postmanager.GetUnameGetHash(username, password)
+                password = ""
         
         elif choice == "delete":
             os.system("cls")
@@ -27,8 +28,9 @@ while running:
         elif choice == "signup":
             username, password, loggedIn = usermanager.SignUp()
 
-            postmanager.GetUnameGetHash(username, password)
-            password = ""
+            if loggedIn:
+                postmanager.GetUnameGetHash(username, password)
+                password = ""
 
         elif choice == "exit":
             break
