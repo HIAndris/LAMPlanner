@@ -26,7 +26,7 @@ def SignUp(name: str, password: str) -> bool:
         return False
     
     if "\n" in name:
-        return False
+        raise ValueError("Newline character found in username!")
     
     passwordHash = CreatePasswordHash(password)
     users = Users("s")
