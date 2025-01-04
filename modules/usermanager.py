@@ -1,9 +1,6 @@
 from modules import filemanager
 import os
 
-def ValidatePassword():
-    pass
-
 def ElvalasztoGeneralas():
     szelesseg = os.get_terminal_size().columns
     elvalaszto = ""
@@ -45,10 +42,7 @@ def LogIn():
             print(f"Nem létezik {username} felhasználó!\n{ElvalasztoGeneralas()}")
 
     return "", "", False
-
-
-def SignUp():
-    pass
+    
 
 def Delete():
     users = filemanager.Users("u")
