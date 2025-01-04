@@ -58,6 +58,7 @@ def PasswordCreation() -> str:
 
     return password
 
+
 def ElvalasztoGeneralas():
     szelesseg = os.get_terminal_size().columns
     elvalaszto = ""
@@ -66,6 +67,7 @@ def ElvalasztoGeneralas():
         elvalaszto += "-"
 
     return elvalaszto
+
 
 def LogIn():
     users = filemanager.Users("u")
@@ -76,7 +78,6 @@ def LogIn():
     while not login and username != "":
         password = ""
         
-
         username = input("Felhasználónév (hagyja üresen a visszalépéshez) --> ")
 
         if username in users:
@@ -144,6 +145,7 @@ def SignUp():
             RuntimeError("Logging in was not successful! :/ (this should not happen)")
     else:
         RuntimeError("Signing up was not successful! :/ (this should not happen)")
+
 
 def Delete():
     users = filemanager.Users("u")
