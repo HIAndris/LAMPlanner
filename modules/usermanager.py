@@ -89,7 +89,7 @@ def LogIn():
                 print("Sikeres bejelentkezés! Üdvözöljük! Használja a help parancsot a parancssegédlet megjelenítéséhez!\n") 
 
                 return username, password, True
-                # Mehet a postmanager
+
             else:
                 os.system("cls")
                 print(f"Helytelen Jelszó, próbálja újra\n{ElvalasztoGeneralas()}")
