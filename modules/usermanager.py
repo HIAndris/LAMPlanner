@@ -4,34 +4,47 @@ import os
 def ValidatePassword():
     pass
 
-def LogIn():
-    login = False
+def ElvalasztoGeneralas():
+    szelesseg = os.get_terminal_size().columns
+    elvalaszto = ""
 
+    for _ in range(szelesseg):
+        elvalaszto += "-"
+
+    return elvalaszto
+
+def LogIn():
     users = filemanager.Users("u")
 
     username = " "
+    login = False
 
     while not login and username != "":
+        password = ""
+        
+
         username = input("Felhasználónév (hagyja üresen a visszalépéshez) --> ")
 
         if username in users:
-            password = input("----------------------------------------------\nJelszó --> ")
+            password = input(f"{ElvalasztoGeneralas()}\nJelszó --> ")
 
             login = filemanager.LogIn(username, password)
 
             if login:
                 os.system("cls")
-                print("Sikeres bejelentkezés, Üdvözöljük! Használja a help parancsot a parancssegédlet megjelenítéséhez\n") 
+                print("Sikeres bejelentkezés! Üdvözöljük! Használja a help parancsot a parancssegédlet megjelenítéséhez!\n") 
 
                 return username, password, True
                 # Mehet a postmanager
             else:
                 os.system("cls")
-                print("Helytelen Jelszó, próbálja újra\n-------------------------------\n")
+                print(f"Helytelen Jelszó, próbálja újra\n{ElvalasztoGeneralas()}")
 
         elif username not in users and username != "":
             os.system("cls")
-            print("Nem létezik ilyen felhasználó!\n------------------------------\n")
+            print(f"Nem létezik {username} felhasználó!\n{ElvalasztoGeneralas()}")
+
+    return "", "", False
 
 
 def SignUp():
@@ -43,7 +56,7 @@ def Delete():
     username = input("Törölni kívánt fiók felhasználóneve (hagyja üresen a visszalépéshez) --> ")
 
     if username in users:
-        password = input("--------------------------------------------------------------------\nTörölni kívánt fiók jelszava --> ")
+        password = input(f"{ElvalasztoGeneralas()}\nTörölni kívánt fiók jelszava --> ")
 
         os.system("cls")
 
@@ -55,7 +68,7 @@ def Delete():
                 print("Felhasználó sikeresen törölve")
             else:
                 os.system("cls")
-                print("Helytelen Jelszó, próbálja újra\n-------------------------------\n")
+                print(f"Helytelen Jelszó, próbálja újra\n{ElvalasztoGeneralas()}")
                 Delete()
         else:
             os.system("cls")
@@ -67,8 +80,5 @@ def Delete():
 
     else:
         os.system("cls")
-        print("Nem létezik ilyen felhasználó!\n------------------------------\n")
+        print(f"Nem létezik {username} felhasználó!\n{ElvalasztoGeneralas()}")
         Delete()
-
-
-filemanager.SignUp("Jóska", "Jelszó")
