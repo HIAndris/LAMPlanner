@@ -6,6 +6,7 @@ import os
 running = True
 loggedIn = False
 username = ""
+password = ""
 
 while running:
     if not loggedIn:
@@ -15,17 +16,24 @@ while running:
         if choice == "login":
             os.system("cls")
             username, password, loggedIn = usermanager.LogIn()
+
+            postmanager.GetUnameGetHash(username, password)
+            password = ""
+        
         elif choice == "delete":
             os.system("cls")
             usermanager.Delete()
+            
         elif choice == "signup":
             username, password, loggedIn = usermanager.SignUp()
+
+            postmanager.GetUnameGetHash(username, password)
+            password = ""
+
         elif choice == "exit":
             break
-    
+            
     if loggedIn:
-        postmanager.GetUnameGetHash(username, password)
-
         user_input = input(f"\n{username} --> ")
 
         if user_input != "logout":
