@@ -48,6 +48,10 @@ while running:
     if loggedIn:
         user_input = input(f"\n{username} --> ")
 
+        if user_input == "":
+            os.system("cls")
+            print("Nem adott meg semmit.")
+
         if user_input != "logout":
             user_input = user_input.split(" ", 1)
             user_input[0] = user_input[0].capitalize()
@@ -55,4 +59,6 @@ while running:
 
             postmanager.MainLoop(user_input)
         else:
+            os.system("cls")
+            print("Kijelentkezett. Válasszon az opciók közül")
             loggedIn = False
