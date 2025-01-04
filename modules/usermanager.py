@@ -58,6 +58,7 @@ def PasswordCreation() -> str:
 
     return password
 
+
 def ElvalasztoGeneralas():
     szelesseg = os.get_terminal_size().columns
     elvalaszto = ""
@@ -66,6 +67,7 @@ def ElvalasztoGeneralas():
         elvalaszto += "-"
 
     return elvalaszto
+
 
 def LogIn():
     users = filemanager.Users("u")
@@ -76,7 +78,6 @@ def LogIn():
     while not login and username != "":
         password = ""
         
-
         username = input("Felhasználónév (hagyja üresen a visszalépéshez) --> ")
 
         if username in users:
@@ -89,7 +90,7 @@ def LogIn():
                 print("Sikeres bejelentkezés! Üdvözöljük! Használja a help parancsot a parancssegédlet megjelenítéséhez!\n") 
 
                 return username, password, True
-                # Mehet a postmanager
+
             else:
                 os.system("cls")
                 print(f"Helytelen Jelszó, próbálja újra\n{ElvalasztoGeneralas()}")
@@ -98,6 +99,7 @@ def LogIn():
             os.system("cls")
             print(f"Nem létezik {username} felhasználó!\n{ElvalasztoGeneralas()}")
 
+    os.system("cls")
     return "", "", False
 
 
@@ -109,10 +111,12 @@ def SignUp():
     correct = False
     os.system("cls")
     while not correct:
+        print("Figyelem! A felhasználónevet és a jelszót nem lehet később megváltoztatni! Elfelejtett jelszó esetén nem lehetséges a felhasználó visszaállítása!\n" + "-" * os.get_terminal_size().columns)
         name = input("Felhasználónév (hagyja üresen a visszalépéshez) --> ")
         nameLen = len(name)
 
         if name == "":
+            os.system("cls")
             return "", "", False
 
         elif name in users:
@@ -145,6 +149,7 @@ def SignUp():
     else:
         RuntimeError("Signing up was not successful! :/ (this should not happen)")
 
+
 def Delete():
     users = filemanager.Users("u")
 
@@ -155,7 +160,7 @@ def Delete():
 
         os.system("cls")
 
-        if input(f"\nBiztosan törölni akaja a {username} nevű fiókot? (igen/nem) --> ") == "igen":
+        if input(f"\nBiztosan törölni akaja a(z) {username} nevű fiókot? (igen/nem) --> ") == "igen":
             deleted = filemanager.DeleteUser(username, password)
 
             if deleted:
@@ -175,5 +180,5 @@ def Delete():
 
     else:
         os.system("cls")
-        print(f"Nem létezik {username} felhasználó!\n{ElvalasztoGeneralas()}")
+        print(f"Nem létezik {username} nevű felhasználó!\n{ElvalasztoGeneralas()}")
         Delete()

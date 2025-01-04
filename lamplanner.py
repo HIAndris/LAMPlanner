@@ -8,17 +8,22 @@ loggedIn = False
 username = ""
 password = ""
 
+os.system("cls")
+print("Üdvözöljük! Válasszon az opciók közül!")
 while running:
     if not loggedIn:
-        os.system("cls")
+        print(usermanager.ElvalasztoGeneralas() + "\nlogin: bejelentkezés\nsignup: regisztráció\ndelete: felhasználó törlése\nexit: kilépés a programból\n" + usermanager.ElvalasztoGeneralas())
         choice = input("Nincs bejelentkezve --> ")
 
         if choice == "login":
             os.system("cls")
             username, password, loggedIn = usermanager.LogIn()
 
-            postmanager.GetUnameGetHash(username, password)
-            password = ""
+            if loggedIn:
+                postmanager.GetUnameGetHash(username, password)
+                password = ""
+            else:
+                print("Válasszon az opciók közül!")
         
         elif choice == "delete":
             os.system("cls")
@@ -27,11 +32,18 @@ while running:
         elif choice == "signup":
             username, password, loggedIn = usermanager.SignUp()
 
-            postmanager.GetUnameGetHash(username, password)
-            password = ""
+            if loggedIn:
+                postmanager.GetUnameGetHash(username, password)
+                password = ""
+            else:
+                print("Válasszon az opciók közül!")
 
         elif choice == "exit":
-            break
+            running = False
+            
+        else:
+            os.system("cls")
+            print("Válasszon az opciók közül!")
             
     if loggedIn:
         user_input = input(f"\n{username} --> ")
