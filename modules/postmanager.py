@@ -127,6 +127,9 @@ def Edit(parancs_parameterek): # Meghívja a fájlkezelés | szerkesztési funkc
 
         except ValueError:
             print("Helytelenül volt megadva a parancs. Nem mentettük a változásokat.")
+
+        except IndexError:
+            print("\nHelytelen volt a bejegyzés elemeinek elválasztása. Nem mentettük a változásokat")
     
     else:
         print("Nem létezik ilyen bejegyzés.")
