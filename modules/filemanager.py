@@ -449,13 +449,13 @@ def EditProperties(serial: int, key: bytes, title: str, newTitle: str = None, ne
     
     userTXTLen = len(userTXT)
     index = 0
-    while index <= userTXTLen and userTXT[index][0] != title:
+    while index < userTXTLen and userTXT[index][0] != title:
         index += 1
-
-    line = userTXT[index]
 
     if userTXTLen == index:
         return False
+    
+    line = userTXT[index]
     
     if isinstance(newTitle, str) and "\n" in newTitle:
         return False
@@ -510,7 +510,7 @@ def EditText(serial: int, key: bytes, title: str, newText: str) -> bool:
 
     userTXTLen = len(userTXT)
     index = 0
-    while index <= userTXTLen and userTXT[index][0] != title:
+    while index < userTXTLen and userTXT[index][0] != title:
         index += 1
 
     line = userTXT[index]
