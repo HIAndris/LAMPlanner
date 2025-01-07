@@ -13,6 +13,7 @@ parancsok = {
     "done":"készre állítja egy bejegyzés állapotát használat: done [bejegyzéscím]",
     "undone":"folyamatban lévőre állítja egy bejegyzés állapotát használat: undone [bejegyzéscím]",
     "Egyéb megjegyzések":"Kérjük a dátumokat ÉÉÉÉ.HH.NN formátumban adja meg. példa: 2025.01.01",
+    "logout":"Kijelentkezés"
 }
 
 def GetUnameGetHash(u_name, u_password):
@@ -256,7 +257,11 @@ def Done(parancs_parameterek):
     os.system('cls')
 
     edit = filemanager.EditProperties(userid, decryption_key, parancs_parameterek[1], newStatus = True)
-    print(f"\nKészre állítottuk a következő bejegyzést: {cim}")
+    
+    if edit:
+        print(f"\nKészre állítottuk a következő bejegyzést: {cim}")
+    else:
+        print(f"Nincs ilyen bejegyzés! ({cim})")
 
 def Undone(parancs_parameterek):
     cim = parancs_parameterek[1]
@@ -264,7 +269,12 @@ def Undone(parancs_parameterek):
     os.system('cls')
 
     edit = filemanager.EditProperties(userid, decryption_key, parancs_parameterek[1], newStatus = False)
-    print(f"\nFolyamatban lévőre állítottuk a következő bejegyzést: {cim}")
+    
+    if edit:
+        print(f"\nFolyamatban lévőre állítottuk a következő bejegyzést: {cim}")
+    else:
+        print(f"Nincs ilyen bejegyzés! ({cim})")
+    
     
 def List(parancs_parameterek): # Bejegyzés | címek listázása |
     megjelenitesi_szamlalo = 0
