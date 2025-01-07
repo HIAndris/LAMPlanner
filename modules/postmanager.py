@@ -90,9 +90,8 @@ def Edit(parancs_parameterek): # Meghívja a fájlkezelés | szerkesztési funkc
     adatok = filemanager.Read(userid, decryption_key, szerkesztendo)
 
     if szerkesztendo in cimek:
-
-        allapot = adatok["status"]
-
+        cimek.remove(szerkesztendo)
+        
         adatsor = (f"Cím: {adatok['title']}; Határidő: {adatok['date']} \n\n{adatok['text']}")
 
         print(f"Szerkesztőfelület \n-----------------\n\nEredeti Bejegyzés és adatai: \n\n{adatsor}\n")
